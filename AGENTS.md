@@ -11,8 +11,8 @@ people. The rules of work and the principles are here; each part's decisions are
 - **The repository is `javni-uvid/ucestvuj`** (made by the maintainer on 20 Nov 2026, which also settled the name:
   Učestvuj; first pushed that day with everything read so far, the maintainer's decision). From then on a
   branch and a pull request per task in an Orca worktree (`~/orca/workspaces/ucestvuj/`; `orca.yaml` runs
-  `uv sync`), `sh tools/posalji.sh <body file>` to ship. There is no site yet: a domain and anything published
-  as a site are the maintainer's decisions.
+  `uv sync`), `sh tools/posalji.sh <body file>` to ship. A preview of the site is on GitHub Pages (21 Nov 2026,
+  the maintainer's request); a domain and the family's link to it are the maintainer's decisions.
 - **The tests are `uv run pytest -q`**; the **test** workflow runs them on every pull request and on `main`,
   and **security** checks the workflows, the packages and the code. On Windows set `PYTHONUTF8=1`.
 - **Ask a source little,** name the project in the User-Agent (`web.AGENT`), read incrementally. The readings
@@ -32,8 +32,10 @@ The project's promises to its readers. Never changed without the maintainer. The
    never supplies a rule, a number or a deadline.
 3. **The site shows; it doesn't judge.** A guide says what the law gives and what a body must do. It does not
    say whether a municipality is good or bad at it, and it ranks none.
-4. **Only what a person does in public office,** and here no person is named at all: a guide names the body and
-   the office ("the president of the assembly"), and links the institution's own page for who holds it.
+4. **Only what a person does in public office.** A guide names the body and the office ("the president of the
+   assembly"), and links the institution's own page for who holds it. A public official named in a source's
+   title stays as the source wrote it; a title that may name a private person is not shown (21 Nov 2026, the
+   maintainer's decision; `docs/decisions/site.md`).
 5. **Nothing from third parties on the pages.** A letter a reader writes with the site's help is made in their
    browser and sent by them; the site receives nothing.
 6. **A source's words stay as they are.** An article is quoted word for word with its number and the version of
@@ -51,12 +53,13 @@ One more, this project's own:
 | Part | File |
 |---|---|
 | The sources, what is read from each and how | `docs/decisions/data.md` |
+| The site: its pages, what a page says, the preview | `docs/decisions/site.md` |
 
 ## Open decisions (the maintainer's)
 
 - The site's address.
 - Which mechanisms come first (`docs/decisions/data.md` has a proposal).
 - Whether a municipality's statute is read by a model and checked by a person, or by a person only.
-- Announcements' titles: which count as a call to take part, and what is done with a title that names a person
-  (`docs/decisions/data.md`, "What the reading showed"). The file is in the repository as read (the maintainer's
-  decision, 20 Nov 2026); nothing from it is shown on a site before this is decided.
+- Which announcements count as a call to take part (a title may be news that a debate was held). Titles that
+  name a person are decided: public officials are kept, a title naming an applicant is not shown
+  (`docs/decisions/site.md`, 21 Nov 2026).

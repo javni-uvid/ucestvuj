@@ -7,7 +7,8 @@ step with the article it rests on.
 
 One of [Javni uvid](https://javni-uvid.github.io/osnova/)'s sites, beside Za ili Protiv and Izborni podaci.
 
-**Status:** started on 20 Nov 2026; the repository is javni-uvid/ucestvuj, and there is no site yet. The first sources are read
+**Status:** started on 20 Nov 2026. A preview of the site: https://javni-uvid.github.io/ucestvuj/ (not indexed by
+search engines). The first sources are read
 into `data/` (the bodies a letter can be sent to, the municipalities, the state's consultations, and what 49
 municipalities announce on their own sites); no guide is written yet. `docs/decisions/data.md` says what each
 source gave and what is not read.
@@ -20,6 +21,7 @@ uv run ucestvuj opendata        # the bodies, the municipalities and local gover
 uv run ucestvuj consultations   # every topic on eKonsultacije
 uv run ucestvuj sites           # what each municipality's own site is and links to (one request per site)
 uv run ucestvuj announcements   # public debates and inspections the municipalities announce (after `sites`)
+uv run ucestvuj site --out _site   # the site from data/ (fails on a page that loads anything from elsewhere)
 uv run pytest -q              # no test asks a source
 ```
 
@@ -29,6 +31,7 @@ uv run pytest -q              # no test asks a source
 |---|---|---|
 | test | on push and pull requests | the test suite |
 | security | on code or workflow changes, Mondays, by hand | actionlint and zizmor (the workflows), pip-audit (the packages), CodeQL (the code) |
+| pages | on a push that changes the site or its data, and by hand | build the site and publish it to GitHub Pages |
 | osnova | daily, and by hand | the organization's shared rules, look and tools copied into `osnova/` |
 
 The readings are run by hand for now; no workflow asks a source.
@@ -52,6 +55,7 @@ The family's (`osnova/principles.md`), whole in `AGENTS.md`.
 osnova/            the organization's shared rules, look and tools (a copy; changed in javni-uvid/osnova)
 docs/decisions/    the decisions by part; data.md has the sources
 src/ucestvuj/        the readers: opendata, consultations, sites, announcements; web (asking a source); cli
+                   site.py, translit.py, static/: the site from data/
 data/              what was read, and sources.json: where each file came from and when
 tests/
 tools/             one-line callers of osnova/tools/

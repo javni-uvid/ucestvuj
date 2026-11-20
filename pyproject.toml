@@ -3,7 +3,9 @@ name = "ucestvuj"
 version = "0.1.0"
 description = "Guides to taking part in decisions where one lives, in Serbia (Javni uvid)"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "tzdata>=2026.6",
+]
 
 [project.scripts]
 ucestvuj = "ucestvuj.cli:main"
