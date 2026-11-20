@@ -7,7 +7,7 @@ keeps. Read on 20 Nov 2026: 675 topics of the republic's bodies (181 open), and 
 although 148 municipalities are registered there. The portal is the source for what the republic consults on,
 and not for what a municipality does."""
 
-from ucesce import web
+from ucestvuj import web
 
 BASE = "https://ekonsultacije.gov.rs"
 TOPICS = BASE + "/api/topicOfDiscussion/findAllFillteredTopicsOfDiscussionAnonUser"

@@ -8,10 +8,10 @@ people. The rules of work and the principles are here; each part's decisions are
 - **Read `osnova/work.md` first:** the rules every javni-uvid project shares. `osnova/security.md` holds the
   guards, `osnova/principles.md` the promises, `osnova/design/` the family's look. The folder is a copy of
   `javni-uvid/osnova`'s `shared/`: changed there, never here.
-- **The project is local** (20 Nov 2026, the maintainer: "let us start it locally"). There is no repository on
-  GitHub yet, so no pull requests, no workflows and no copy by the **osnova** workflow: `osnova/` here was
-  copied by hand and is refreshed by hand until the repository exists. Making the repository, a name, a domain
-  and anything published are the maintainer's decisions.
+- **The repository is `javni-uvid/ucestvuj`** (made by the maintainer on 20 Nov 2026, which also settled the name:
+  Učestvuj). Until the first push the work is local: `osnova/` here was copied by hand, and no workflow has
+  run. What is pushed there is public: see the open decision on `data/announcements.json` below first. A
+  domain and anything published as a site stay the maintainer's decisions.
 - **Ask a source little,** name the project in the User-Agent (`web.AGENT`), read incrementally. The readings
   are run by hand for now (README.md, Commands); the tests (`uv run pytest -q`) ask no source.
 - **Talk to the maintainer in Serbian** (Latin script), briefly. Code, comments and docs are in English.
@@ -51,7 +51,7 @@ One more, this project's own:
 
 ## Open decisions (the maintainer's)
 
-- The name and the address.
+- The site's address.
 - Which mechanisms come first (`docs/decisions/data.md` has a proposal).
 - Whether a municipality's statute is read by a model and checked by a person, or by a person only.
 - Announcements' titles: which count as a call to take part, and what is done with a title that names a person

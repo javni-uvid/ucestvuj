@@ -10,7 +10,7 @@ import hashlib
 import io
 from pathlib import Path
 
-from ucesce import web
+from ucestvuj import web
 
 API = "https://data.gov.rs/api/1/datasets/?organization={org}&page_size=100"
 COMMISSIONER = "58590b21cbe3c816ac018e67"  # Повереник за информације од јавног значаја и заштиту података о личности

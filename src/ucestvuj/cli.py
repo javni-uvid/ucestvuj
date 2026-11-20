@@ -30,14 +30,14 @@ def note(name: str, what: dict) -> None:
 
 
 def opendata(_args) -> None:
-    from ucesce import opendata as source
+    from ucestvuj import opendata as source
     for name, what in source.fetch(DATA).items():
         note(name, what)
         print(f'{name}: {what["rows"]} rows from "{what["title"]}" (changed {what["modified"]})')
 
 
 def consultations(_args) -> None:
-    from ucesce import consultations as source
+    from ucestvuj import consultations as source
     found = source.fetch()
     save(DATA / "consultations.json", found["topics"])
     save(DATA / "consultation_institutions.json", found["institutions"])
@@ -51,7 +51,7 @@ def consultations(_args) -> None:
 
 
 def sites(_args) -> None:
-    from ucesce import sites as source
+    from ucestvuj import sites as source
     seen = source.survey(DATA / "municipal_sites.csv")
     save(DATA / "sites.json", seen)
     up = [s for s in seen if s["answers"]]
@@ -60,7 +60,7 @@ def sites(_args) -> None:
 
 
 def announcements(_args) -> None:
-    from ucesce import announcements as source
+    from ucestvuj import announcements as source
     seen = json.loads((DATA / "sites.json").read_text(encoding="utf-8"))
     found = source.fetch(seen)
     save(DATA / "announcements.json", found)
@@ -70,7 +70,7 @@ def announcements(_args) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(prog="ucesce", description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(prog="ucestvuj", description=__doc__.splitlines()[0])
     commands = parser.add_subparsers(dest="command", required=True)
     for name, run, about in (
         ("opendata", opendata, "the bodies, the municipalities and local government's tasks, from data.gov.rs"),

@@ -7,7 +7,7 @@ import urllib.request
 
 # The form well-behaved robots use: some servers answer nothing to an agent that does not begin this way
 # (ekonsultacije.gov.rs, 20 Nov 2026: an empty answer to a plain name). It still says who asks and where to find us.
-AGENT = "Mozilla/5.0 (compatible; javni-uvid-ucesce/0.1; +https://github.com/javni-uvid)"
+AGENT = "Mozilla/5.0 (compatible; javni-uvid-ucestvuj/0.1; +https://github.com/javni-uvid)"
 _last: dict[str, float] = {}
 
 

@@ -15,7 +15,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 
-from ucesce import web
+from ucestvuj import web
 
 ASKED = ("јавна расправа", "javna rasprava", "јавни увид", "javni uvid")
 # What a title says the announcement is; the first that matches. Latin and Cyrillic, lower case.

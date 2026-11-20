@@ -2,7 +2,7 @@
 
 import pytest
 
-from ucesce import announcements, consultations, opendata, sites
+from ucestvuj import announcements, consultations, opendata, sites
 
 
 def test_the_columns_that_name_people_never_reach_the_data():

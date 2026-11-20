@@ -1,4 +1,4 @@
-# Učešće (working name)
+# Učestvuj
 
 Guides to how a person takes part in decisions where they live, in Serbia: what the law gives them (a citizens'
 assembly, a citizens' initiative, a local referendum, a public debate, a request for information of public
@@ -7,7 +7,7 @@ step with the article it rests on.
 
 One of [Javni uvid](https://javni-uvid.github.io/osnova/)'s sites, beside Za ili Protiv and Izborni podaci.
 
-**Status:** started locally on 20 Nov 2026. No repository on GitHub and no site. The first sources are read
+**Status:** started on 20 Nov 2026; the repository is javni-uvid/ucestvuj, and there is no site yet. The first sources are read
 into `data/` (the bodies a letter can be sent to, the municipalities, the state's consultations, and what 49
 municipalities announce on their own sites); no guide is written yet. `docs/decisions/data.md` says what each
 source gave and what is not read.
@@ -16,10 +16,10 @@ source gave and what is not read.
 
 ```sh
 uv sync
-uv run ucesce opendata        # the bodies, the municipalities and local government's tasks, from data.gov.rs
-uv run ucesce consultations   # every topic on eKonsultacije
-uv run ucesce sites           # what each municipality's own site is and links to (one request per site)
-uv run ucesce announcements   # public debates and inspections the municipalities announce (after `sites`)
+uv run ucestvuj opendata        # the bodies, the municipalities and local government's tasks, from data.gov.rs
+uv run ucestvuj consultations   # every topic on eKonsultacije
+uv run ucestvuj sites           # what each municipality's own site is and links to (one request per site)
+uv run ucestvuj announcements   # public debates and inspections the municipalities announce (after `sites`)
 uv run pytest -q              # no test asks a source
 ```
 
@@ -41,7 +41,7 @@ The family's (`osnova/principles.md`), whole in `AGENTS.md`.
 ```
 osnova/            the organization's shared rules, look and tools (a copy; changed in javni-uvid/osnova)
 docs/decisions/    the decisions by part; data.md has the sources
-src/ucesce/        the readers: opendata, consultations, sites, announcements; web (asking a source); cli
+src/ucestvuj/        the readers: opendata, consultations, sites, announcements; web (asking a source); cli
 data/              what was read, and sources.json: where each file came from and when
 tests/
 tools/             one-line callers of osnova/tools/

@@ -13,7 +13,7 @@ import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from ucesce import web
+from ucestvuj import web
 
 # What a link's words say it leads to. Latin and Cyrillic, without the endings, lower case.
 KINDS = {
