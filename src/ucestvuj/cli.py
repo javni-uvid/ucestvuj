@@ -69,6 +69,16 @@ def announcements(_args) -> None:
     print(f'announcements: {len(found)} from {len({f["code"] for f in found})} municipalities')
 
 
+def site(args) -> None:
+    from ucestvuj import site as source
+    wrong = source.build(Path(args.out))
+    for w in wrong:
+        print("site:", w, file=sys.stderr)
+    if wrong:
+        raise SystemExit(1)
+    print(f"site: {args.out}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="ucestvuj", description=__doc__.splitlines()[0])
     commands = parser.add_subparsers(dest="command", required=True)
@@ -79,6 +89,9 @@ def main() -> int:
         ("announcements", announcements, "public debates and inspections the municipalities announce on their sites"),
     ):
         commands.add_parser(name, help=about).set_defaults(run=run)
+    build = commands.add_parser("site", help="build the site from data/ (fails on a page that loads from elsewhere)")
+    build.add_argument("--out", default="_site")
+    build.set_defaults(run=site)
     args = parser.parse_args()
     args.run(args)
     return 0
