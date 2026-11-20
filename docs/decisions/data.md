@@ -80,3 +80,59 @@ Javni uvid's own earlier survey: they help find a rule and never supply one.
 The request for information of public importance: one law, the same for the whole country, no statute needed,
 and the catalogue gives the address of every body. One guide and one letter-writer, then the citizens'
 initiative and the citizens' assembly, which need the statutes.
+
+## What was read on 20 Nov 2026
+
+Everything below is in `data/`, with where it came from and the day in `data/sources.json`.
+
+| File | From | What |
+|---|---|---|
+| `bodies.csv` | the Commissioner's catalogue | 12,363 bodies: name, category, two classifications, address, post code, seat, web address. The contact and authorised-persons columns are not taken; the file's own headings are dropped. |
+| `municipalities.csv` | the ministry's contacts of local government | 145 cities and municipalities: name and address. The columns of the mayors, presidents and heads are not taken. |
+| `tasks.csv` | the ministry's tasks of local government | 1,203 tasks with area, legal basis, level and competent body. |
+| `consultations.json`, `consultation_institutions.json` | eKonsultacije | 679 topics (181 not ended) and the 204 institutions registered. |
+| `municipal_sites.csv`, `sites.json` | izborna-analiza's list; each site's first page | 157 sites, 152 answer: what each runs on, its feed, and its first page's links by what they lead to. |
+| `announcements.json` | the municipalities' own sites | 1,530 announcements of public debates (688), public inspections (582) and early public inspections (260) from 49 municipalities; 1,088 with a day; 32 in the last 30 days, from 18 municipalities. |
+
+## What the reading showed
+
+- **eKonsultacije is the republic's, not the municipalities'.** 148 municipalities are registered there and four
+  topics of theirs exist, none open. What a municipality consults on is on its own site only.
+- **"Not ended" on eKonsultacije is not "open".** Of the 181 topics not marked ended, 65 were created in 2024 or
+  earlier. Whether a topic can still be commented on needs its phases' and methods' dates, which the list does
+  not carry (the portal's page of a topic asks for them separately; not read yet).
+- **The portal answers nothing to a plain agent name**, and answers the form robots use
+  (`Mozilla/5.0 (compatible; name; +address)`). `web.AGENT` is that form and still says who asks.
+- **Its list is asked page by page:** `start` is the page's number, and the reading stops when the count it read
+  differs from the count the portal says.
+- **A third of the municipal sites can be asked directly.** 51 run on WordPress and 45 of them gave
+  announcements through their own search; 15 are the state's `ls.gov.rs` sites, which keep announcements as a
+  kind of content of their own with a category for public debates. 48 sites have a feed, which gives only the
+  newest entries (18 announcements).
+- **The other two thirds are not read yet.** Of the 152 sites that answer, 48 link public debates from the first
+  page, 40 public inspections, 85 the budget, 92 the assembly's sittings, 52 the official gazette and 43 the
+  statute (`sites.json`): for those the list page behind the link has to be read, site by site or by system
+  (10 run on Joomla).
+- **An announcement's title is the municipality's own words** and is what tells a debate from an inspection. Some
+  titles are news that a debate was held, not a call to one; some name an investor or an official. Before
+  anything is published: a rule for what is a call, and a decision on titles that name a person (principle 4).
+- **Užice and Sevojno share one site** (`uzice.rs`), so the same announcements stand under both.
+
+## Where the rest of what a citizen can take part in is
+
+Not read yet; in the order of what each would add.
+
+1. **A topic's dates and documents on eKonsultacije** (its phases and methods): turns the list into "open until".
+2. **The list pages behind the first page's links** on the sites that have no search to ask (`sites.json`), the
+   `ls.gov.rs` category first, as its 15 sites are built alike.
+3. **Public inspections of plans** are also announced by the body that makes the plan: the ministry in charge of
+   construction for the republic's spatial plans, the province's secretariat, a city's planning institute.
+4. **Environmental impact assessments**: the ministry of environmental protection, the province and the
+   municipalities announce each study's public inspection and debate; the ministry is already the institution
+   with most topics on eKonsultacije (107).
+5. **The National Assembly's public hearings** and bills in procedure: Za ili Protiv reads the Assembly's site.
+6. **A municipal assembly's sittings and agendas** (92 sites link them): when a decision is made, and on what.
+7. **The statutes and the official gazettes** (43 and 52 sites link them): what each municipality's statute says
+   about an initiative, an assembly and a debate, the second layer above.
+8. **How requests for information end**, by body: the Commissioner's 16 other datasets (complaints, decisions),
+   as counts and never as a ranking (principle 3).

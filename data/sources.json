@@ -1,0 +1,73 @@
+{
+ "announcements": {
+  "announcements": 1530,
+  "from": "the municipalities' own sites (data/sites.json)",
+  "municipalities": 49,
+  "read": "2026-11-20"
+ },
+ "bodies": {
+  "kept": [
+   "name",
+   "category",
+   "class_1",
+   "class_2",
+   "address",
+   "post_code",
+   "seat",
+   "web"
+  ],
+  "modified": "2026-11-20",
+  "page": "https://data.gov.rs/sr/datasets/katalog/",
+  "read": "2026-11-20",
+  "rows": 12363,
+  "sha256": "7478199e76bb4599b7715693e723ca3062a9f078cbc19a78010c5a60e64203c7",
+  "title": "Каталог органа јавне власти (у смислу Закона о слободном приступу информацијама од јавног значаја)",
+  "url": "https://data.poverenik.rs/dataset/c27210a9-571f-4434-9212-890c5209e4d6/resource/968d9630-adcc-4a57-978f-0f6b3e895a02/download/katalog.csv"
+ },
+ "consultations": {
+  "institutions": 204,
+  "local": 4,
+  "local_institutions": 148,
+  "open": 181,
+  "read": "2026-11-20",
+  "topics": 679,
+  "url": "https://ekonsultacije.gov.rs"
+ },
+ "municipalities": {
+  "kept": [
+   "name",
+   "address"
+  ],
+  "modified": "2026-04-23",
+  "page": "https://data.gov.rs/sr/datasets/kontakt-podaci-jedinica-lokalne-samouprave-jls/",
+  "read": "2026-11-20",
+  "rows": 145,
+  "sha256": "b1667dc245a7fbd942461da1cb77362e19b207ab9142eabea59c6391ef636cc0",
+  "title": "Контакт подаци јединица локалне самоуправе (ЈЛС)",
+  "url": "https://data.gov.rs/s/resources/kontakt-podaci-jedinica-lokalne-samouprave-jls/20260423-143205/kontakt-podaci-jls.csv"
+ },
+ "sites": {
+  "answer": 152,
+  "list": "javni-uvid/izborna-analiza data/municipal_sites.csv",
+  "read": "2026-11-20",
+  "sites": 157
+ },
+ "tasks": {
+  "kept": [
+   "area",
+   "sub_area",
+   "task",
+   "legal_basis",
+   "level",
+   "body",
+   "kind"
+  ],
+  "modified": "2026-04-23",
+  "page": "https://data.gov.rs/sr/datasets/izvorni-i-povereni-poslovi-jedinica-lokalne-samouprave-po-oblastima/",
+  "read": "2026-11-20",
+  "rows": 1203,
+  "sha256": "25177393f35ac50e6b9e4bdecb9d79553b6073c1e4a778f2d48324891e8b1e4c",
+  "title": "Изворни и поверени послови јединица локалне самоуправе по областима",
+  "url": "https://data.gov.rs/s/resources/izvorni-i-povereni-poslovi-jedinica-lokalne-samouprave-po-oblastima/20260423-141922/izvorni-i-povereni-poslovi-po-oblastima.csv"
+ }
+}

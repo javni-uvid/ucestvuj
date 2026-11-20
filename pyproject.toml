@@ -1,0 +1,22 @@
+[project]
+name = "ucesce"
+version = "0.1.0"
+description = "Guides to taking part in decisions where one lives, in Serbia (Javni uvid)"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+ucesce = "ucesce.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ucesce"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

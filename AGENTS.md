@@ -12,7 +12,8 @@ people. The rules of work and the principles are here; each part's decisions are
   GitHub yet, so no pull requests, no workflows and no copy by the **osnova** workflow: `osnova/` here was
   copied by hand and is refreshed by hand until the repository exists. Making the repository, a name, a domain
   and anything published are the maintainer's decisions.
-- **Ask a source little,** name the project in the User-Agent, read incrementally.
+- **Ask a source little,** name the project in the User-Agent (`web.AGENT`), read incrementally. The readings
+  are run by hand for now (README.md, Commands); the tests (`uv run pytest -q`) ask no source.
 - **Talk to the maintainer in Serbian** (Latin script), briefly. Code, comments and docs are in English.
 
 ## Principles
@@ -53,3 +54,5 @@ One more, this project's own:
 - The name and the address.
 - Which mechanisms come first (`docs/decisions/data.md` has a proposal).
 - Whether a municipality's statute is read by a model and checked by a person, or by a person only.
+- Announcements' titles: which count as a call to take part, and what is done with a title that names a person
+  (`docs/decisions/data.md`, "What the reading showed"). Nothing from `announcements.json` is published before.
