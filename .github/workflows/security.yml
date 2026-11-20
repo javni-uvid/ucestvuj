@@ -1,0 +1,80 @@
+# Security checks: the workflows themselves (actionlint: can GitHub read them; zizmor: injected inputs, tokens left behind, unpinned actions,
+# permissions), the Python packages against known vulnerabilities (pip-audit, from uv.lock), and the code
+# (CodeQL: Python and the workflows; its findings go to the Security tab). On changes to
+# the code or the workflows (on main and in pull requests, so a workflow is checked before it is merged), every
+# Monday, and by hand. Reads only.
+name: security
+
+on:
+  push:
+    branches: [main]
+    paths: [".github/**", "src/**", "tools/**", "pyproject.toml", "uv.lock"]
+  pull_request:
+    paths: [".github/**", "src/**", "tools/**", "pyproject.toml", "uv.lock"]
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  workflows:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: actionlint
+        run: |
+          # GitHub refuses a workflow it can't read (a key twice in a step, a wrong expression) without a word until
+          # it is started (zailiprotiv's votes stopped so on 17 Nov 2026).
+          pip install -q actionlint-py==1.7.12.25
+          actionlint -shellcheck= -pyflakes=
+      - name: zizmor
+        run: |
+          pip install -q zizmor==1.32.0
+          zizmor --format plain --config .github/zizmor.yml .github/workflows/
+
+  packages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: pip-audit
+        run: |
+          pip install -q uv==0.13.9 pip-audit==2.9.0
+          uv export --frozen --no-hashes --no-emit-project -q > requirements.txt
+          pip-audit -r requirements.txt --progress-spinner off
+
+  code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write  # the findings, to the Security tab
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, actions]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066  # v4.39.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066  # v4.39.3
+        with:
+          category: "/language:${{ matrix.language }}"

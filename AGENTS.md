@@ -9,9 +9,12 @@ people. The rules of work and the principles are here; each part's decisions are
   guards, `osnova/principles.md` the promises, `osnova/design/` the family's look. The folder is a copy of
   `javni-uvid/osnova`'s `shared/`: changed there, never here.
 - **The repository is `javni-uvid/ucestvuj`** (made by the maintainer on 20 Nov 2026, which also settled the name:
-  Učestvuj). Until the first push the work is local: `osnova/` here was copied by hand, and no workflow has
-  run. What is pushed there is public: see the open decision on `data/announcements.json` below first. A
-  domain and anything published as a site stay the maintainer's decisions.
+  Učestvuj; first pushed that day with everything read so far, the maintainer's decision). From then on a
+  branch and a pull request per task in an Orca worktree (`~/orca/workspaces/ucestvuj/`; `orca.yaml` runs
+  `uv sync`), `sh tools/posalji.sh <body file>` to ship. There is no site yet: a domain and anything published
+  as a site are the maintainer's decisions.
+- **The tests are `uv run pytest -q`**; the **test** workflow runs them on every pull request and on `main`,
+  and **security** checks the workflows, the packages and the code. On Windows set `PYTHONUTF8=1`.
 - **Ask a source little,** name the project in the User-Agent (`web.AGENT`), read incrementally. The readings
   are run by hand for now (README.md, Commands); the tests (`uv run pytest -q`) ask no source.
 - **Talk to the maintainer in Serbian** (Latin script), briefly. Code, comments and docs are in English.
@@ -55,4 +58,5 @@ One more, this project's own:
 - Which mechanisms come first (`docs/decisions/data.md` has a proposal).
 - Whether a municipality's statute is read by a model and checked by a person, or by a person only.
 - Announcements' titles: which count as a call to take part, and what is done with a title that names a person
-  (`docs/decisions/data.md`, "What the reading showed"). Nothing from `announcements.json` is published before.
+  (`docs/decisions/data.md`, "What the reading showed"). The file is in the repository as read (the maintainer's
+  decision, 20 Nov 2026); nothing from it is shown on a site before this is decided.

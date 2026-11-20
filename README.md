@@ -23,6 +23,16 @@ uv run ucestvuj announcements   # public debates and inspections the municipalit
 uv run pytest -q              # no test asks a source
 ```
 
+## Workflows
+
+| Workflow | When | What |
+|---|---|---|
+| test | on push and pull requests | the test suite |
+| security | on code or workflow changes, Mondays, by hand | actionlint and zizmor (the workflows), pip-audit (the packages), CodeQL (the code) |
+| osnova | daily, and by hand | the organization's shared rules, look and tools copied into `osnova/` |
+
+The readings are run by hand for now; no workflow asks a source.
+
 ## What it will hold
 
 - **A guide per mechanism**, one template for all: who may use it, what it takes (signatures, a deadline, a
@@ -45,6 +55,7 @@ src/ucestvuj/        the readers: opendata, consultations, sites, announcements;
 data/              what was read, and sources.json: where each file came from and when
 tests/
 tools/             one-line callers of osnova/tools/
+.github/           the workflows; dependabot (monthly); the pull request's template
 ```
 
 ## License

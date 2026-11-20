@@ -1,0 +1,7 @@
+# zizmor (the workflows' security check, security.yml). The osnova workflow commits and pushes the copy of the
+# organization's shared rules, so its checkout keeps the token on purpose; checkouts in jobs that don't push
+# keep none.
+rules:
+  artipacked:
+    ignore:
+      - osnova.yml
