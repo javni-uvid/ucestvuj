@@ -2,7 +2,7 @@
 
 import pytest
 
-from ucestvuj import announcements, consultations, opendata, sites
+from ucestvuj import announcements, consultations, opendata, sites, when
 
 
 def test_the_columns_that_name_people_never_reach_the_data():
@@ -75,25 +75,69 @@ def test_a_new_copy_of_the_list_says_what_it_changed():
     assert sites.table('municipality_code,name,domain,note\n1,Ада,ada.org.rs,"a, b"\n')[0]["note"] == "a, b"
 
 
-def test_the_days_an_announcement_names_are_read_from_its_text():
-    days = announcements.days
-    # the session that adopted the draft is before the announcement; a range's first day takes its end's year
-    text = ("на седници одржаној 22.09.2026. године, утврдила Нацрт. 1. ЈАВНИ УВИД обавиће се од 12. октобра до "
-            "23. новембра 2026. године, сваког радног дана од 9 до 18 часова. 2. ЈАВНА СЕДНИЦА одржаће се "
-            "8. децембра 2026. године у 13 часова (сала на 20. спрату). Закон („Службени гласник РС”, бр. 72/09, 9/20)")
-    assert days(text, "2026-10-29") == ["2026-11-23", "2026-12-08"]
-    assert days("одржаће се од 28.10.2026. до 11.11.2026. године, а седница 12.11.2026. године у 11,00 часова",
-                "2026-10-28") == ["2026-10-28", "2026-11-11", "2026-11-12"]
-    assert days("Javna rasprava traje od 20. decembra do 15. januara 2027. godine", "2026-12-18") == ["2026-12-20", "2027-01-15"]
-    assert days("почев од дана 2 0 . новембра 202 6 . године до дана 4 . децембра 202 6. године", "2026-11-20") == ["2026-11-20", "2026-12-04"]
-    # a day without a year is not guessed; an amount, a time and a law's number are not days
-    assert days("трајала је од 28.октобра до 11.новембра, у 10:00, износ 1.250.000,00, члана 4., 7. и 8. Одлуке, 31.11.2026.", "2026-10-28") == []
-    assert days("Јавни увид траје до 1. децембра 2026. године", "") == [] and days("", "2026-11-01") == []
-    assert days("рок је 1.12.2029.", "2026-11-01") == []  # too far ahead to be this announcement's
-
-
-def test_an_announcement_keeps_the_days_of_its_text_and_not_the_text():
+def test_an_announcement_keeps_when_it_is_on_and_not_its_text():
     a = announcements.entry("Јавни позив за јавну расправу", "https://a.rs/1", "2026-11-01T08:00:00", "wordpress posts",
                             "<p>Примедбе на мејл господина Петра Петровића, p@a.rs, до 15.11.2026. године.</p>")
-    assert a["days"] == ["2026-11-15"] and "Петр" not in str(a) and "p@a.rs" not in str(a)
-    assert announcements.entry("Јавна расправа", "https://a.rs/2", "", "wordpress search")["days"] == []
+    assert a["when"] == [{"what": "remarks", "from": "", "to": "2026-11-15", "days": 0, "hour": ""}]
+    assert "Петр" not in str(a) and "p@a.rs" not in str(a)
+    assert announcements.entry("Јавна расправа", "https://a.rs/2", "", "wordpress search")["when"] == []
+    # a title that says the period itself is read with the text
+    titled = announcements.entry("Јавна расправа о буџету у периоду од 2. до 23. новембра 2026. године", "https://a.rs/3",
+                                 "2026-11-02", "feed", "Позивамо грађане.")
+    assert [(p["what"], p["from"], p["to"]) for p in titled["when"]] == [("debate", "2026-11-02", "2026-11-23")]
+
+
+def short(text, published):
+    return [(p["what"], p["from"], p["to"], p["days"], p["hour"]) for p in when.read(text, published)]
+
+
+def test_a_period_keeps_both_its_ends_and_what_it_is_of():
+    # Senta, 4 Nov 2026: the inspection began before the announcement and is still one period
+    senta = ("Јавни увид одржаће се у згради Градске куће у Сенти, Главни трг бр. 1, канцеларија бр. 23 (I спрат), у трајању "
+             "од 30 дана, од 30. октобра до 28. новембра 2026. године, сваког радног дана од 10 до 13 часова")
+    assert short(senta, "2026-11-04") == [("inspection", "2026-10-30", "2026-11-28", 0, "")]
+    # the session that adopted the draft is over; the inspection and the session to come are named apart
+    beograd = ("на седници одржаној 22.09.2026. године, утврдила Нацрт. 1. ЈАВНИ УВИД обавиће се од 12. октобра до "
+               "23. новембра 2026. године, сваког радног дана од 9 до 18 часова. 2. ЈАВНА СЕДНИЦА Комисије за планове, "
+               "одржаће се 8. децембра 2026. године у 13 часова (сала на 20. спрату). („Службени гласник РС”, бр. 72/09, 9/20)")
+    assert short(beograd, "2026-10-29") == [("inspection", "2026-10-12", "2026-11-23", 0, ""), ("session", "2026-12-08", "2026-12-08", 0, "13:00")]
+    vlasotince = ("Јавна расправа о Нацрту одлуке одржаће се од 28.10.2026. до 11.11.2026. године. Примедбе и сугестије "
+                  "достављају се поштом. У оквиру спровођења јавне расправе одржаће се јавна седница 12.11.2026. године у сали "
+                  "Скупштине са почетком у 11,00 часова")
+    assert short(vlasotince, "2026-10-28") == [("debate", "2026-10-28", "2026-11-11", 0, ""), ("session", "2026-11-12", "2026-11-12", 0, "")]
+    assert short("Javna rasprava traje od 20. decembra do 15. januara 2027. godine", "2026-12-18") == [("debate", "2026-12-20", "2027-01-15", 0, "")]
+    assert short("Јавна расправа ће трајати почев од дана 2 0 . новембра 202 6 . године до дана 4 . децембра 202 6. године",
+                 "2026-11-20") == [("debate", "2026-11-20", "2026-12-04", 0, "")]
+
+
+def test_an_end_a_start_and_a_day_alone_are_told_apart():
+    assert short("Јавни увид траје до 1. децембра 2026. године, до када се могу доставити примедбе", "2026-11-20") == [
+        ("inspection", "", "2026-12-01", 0, "")]
+    # a length is kept as the text gives it; the last day is not counted out
+    assert short("Јавни увид у Нацрт Плана, одржаће се у трајању од 3 0 дана и то почев од 30 .10.2026 . Наведени плански документ",
+                 "2026-10-30") == [("inspection", "2026-10-30", "", 30, "")]
+    assert short("биће представљен на Округлом столу, који ће се одржати у среду 30.11.2026. године у Сечњу, у сали у 12:00 часова",
+                 "2026-11-03") == [("meeting", "2026-11-30", "2026-11-30", 0, "")]
+    assert short("Отворени састанак ће се одржати дана 28.10.2026. године у 10 часова. Одлука се примењује од 1.1.2027.", "2026-10-22") == [
+        ("meeting", "2026-10-28", "2026-10-28", 0, "10:00")]  # a bare start nothing names may be anything: not kept
+    # the days of a list are of one thing; a period's end said again is said once; remarks are their own
+    assert short("јавне седнице Комисије за јавни увид одржати 27.08.2026., 28.08.2026. и 29.08.2026. године у амфитеатру",
+                 "2026-08-01") == [("session", f"2026-08-{d}", f"2026-08-{d}", 0, "") for d in (27, 28, 29)]
+    assert short("Јавна расправа спровешће се од 2. новембра 2026. године до 23. новембра 2026. године. Предлози у току трајања "
+                 "јавне расправе, закључно са 23. новембром 2026. године. Примедбе се достављају до 23.11.2026. године.",
+                 "2026-11-02") == [("debate", "2026-11-02", "2026-11-23", 0, ""), ("remarks", "", "2026-11-23", 0, "")]
+    assert short("Седница одбора биће 5.11.2026. године у 10 часова", "2026-11-01") == [("", "2026-11-05", "2026-11-05", 0, "10:00")]
+    # a day without a year is not guessed; an amount, a time and a law's number are not days; a wrong day is none
+    assert short("трајала је од 28.октобра до 11.новембра, у 10:00, износ 1.250.000,00, члана 4., 7. и 8. Одлуке, 31.11.2026.", "2026-10-28") == []
+    assert short("Јавни увид траје до 1. децембра 2026. године", "") == [] and short("", "2026-11-01") == []
+    assert short("рок је 1.12.2029.", "2026-11-01") == []  # too far ahead to be this announcement's
+
+
+def test_what_is_ahead_is_the_nearest_day_still_to_come():
+    period = {"what": "inspection", "from": "2026-10-30", "to": "2026-11-28", "days": 0, "hour": ""}
+    session = {"what": "session", "from": "2026-12-08", "to": "2026-12-08", "days": 0, "hour": "13:00"}
+    started = {"what": "inspection", "from": "2026-10-30", "to": "", "days": 30, "hour": ""}
+    assert when.ahead([period, session], "2026-11-21") == "2026-11-28" and when.ahead([period, session], "2026-11-29") == "2026-12-08"
+    assert when.ahead([period], "2026-11-29") == "" and when.ahead([], "2026-11-21") == ""
+    assert when.ahead([started], "2026-11-21") == "2026-11-29" and when.ahead([started], "2026-11-30") == ""
+    assert when.ahead([{**session, "what": ""}], "2026-11-21") == ""  # a day nothing names is shown, not counted

@@ -53,13 +53,20 @@ def test_a_municipality_says_what_is_read_of_it():
     assert site.state_of("a.rs", {"domain": "a.rs", "answers": ""}, 0) == "не одговара"
 
 
-def test_what_is_ahead_comes_first_by_its_nearest_day(tmp_path):
+def test_what_is_ahead_comes_first_with_its_periods(tmp_path):
     out = tmp_path / "s"
     site.build(out, datetime.date(2026, 11, 21))
     home = (out / "cir" / "index.html").read_text(encoding="utf-8")
     ahead = home.split("У општинама: предстоји")[1].split("У општинама: остали позиви")[0]
-    assert "Дани у објави:" in ahead and "· одржано" not in ahead
-    row = {"title": "Јавна расправа", "url": "https://a.rs/1", "code": "1", "kind": "debate", "day": "2026-11-01",
-           "days": ["2026-11-15", "2026-12-04"]}
-    assert "Дани у објави: 15. 11. 2026., 4. 12. 2026." in site.item(row, {"1": "Ада"})
-    assert "Дани у објави" not in site.item({**row, "days": []}, {"1": "Ада"})
+    assert 'class="days">Јавни увид: од 30. 10. 2026. до 28. 11. 2026.<' in ahead and "· одржано" not in ahead
+    row = {"title": "Јавна расправа", "url": "https://a.rs/1", "code": "1", "kind": "debate", "day": "2026-11-01", "when": [
+        {"what": "debate", "from": "2026-11-01", "to": "2026-11-15", "days": 0, "hour": ""},
+        {"what": "session", "from": "2026-11-16", "to": "2026-11-16", "days": 0, "hour": "13:00"},
+        {"what": "remarks", "from": "", "to": "2026-11-15", "days": 0, "hour": ""},
+        {"what": "inspection", "from": "2026-11-01", "to": "", "days": 30, "hour": ""},
+        {"what": "", "from": "2026-12-01", "to": "2026-12-01", "days": 0, "hour": ""}]}
+    shown = site.item(row, {"1": "Ада"})
+    for words in ("Јавна расправа: од 1. 11. 2026. до 15. 11. 2026.", "Јавна седница: 16. 11. 2026. у 13:00", "Примедбе: до 15. 11. 2026.",
+                  "Јавни увид: од 1. 11. 2026., 30 дана", "У објави: 1. 12. 2026."):
+        assert f">{words}<" in shown, words
+    assert 'class="days"' not in site.item({**row, "when": []}, {"1": "Ада"})

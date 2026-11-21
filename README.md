@@ -10,8 +10,8 @@ One of [Javni uvid](https://javni-uvid.github.io/osnova/)'s sites, beside Za ili
 **Status:** started on 20 Nov 2026. A preview of the site: https://javni-uvid.github.io/ucestvuj/ (not indexed by
 search engines). The first sources are read
 into `data/` (the bodies a letter can be sent to, the municipalities, the state's consultations, and what 49
-municipalities announce on their own sites, with the days each announcement names, so the site lists first what
-is still ahead); no guide is written yet. `docs/decisions/data.md` says what each
+municipalities announce on their own sites, with when what each calls to is on: the period of a debate or an
+inspection, a session's day and hour, the last day for remarks; so the site lists first what is still ahead); no guide is written yet. `docs/decisions/data.md` says what each
 source gave and what is not read.
 
 ## Commands
@@ -22,7 +22,7 @@ uv run ucestvuj opendata        # the bodies, the municipalities and local gover
 uv run ucestvuj consultations   # every topic on eKonsultacije
 uv run ucestvuj list            # the municipalities' sites: izborna-analiza's list, copied (says what changed)
 uv run ucestvuj sites           # what each municipality's own site is and links to (one request per site)
-uv run ucestvuj announcements   # public debates and inspections the municipalities announce, with the days each names (after `sites`)
+uv run ucestvuj announcements   # public debates and inspections the municipalities announce, and when each is on (after `sites`)
 uv run ucestvuj site --out _site   # the site from data/ (fails on a page that loads anything from elsewhere)
 uv run pytest -q              # no test asks a source
 ```
@@ -61,7 +61,7 @@ The family's (`osnova/principles.md`), whole in `AGENTS.md`.
 ```
 osnova/            the organization's shared rules, look and tools (a copy; changed in javni-uvid/osnova)
 docs/decisions/    the decisions by part; data.md has the sources
-src/ucestvuj/        the readers: opendata, consultations, sites, announcements; web (asking a source); cli
+src/ucestvuj/        the readers: opendata, consultations, sites, announcements (when: its periods and days); web; cli
                    site.py, translit.py, static/: the site from data/
 data/              what was read, and sources.json: where each file came from and when
 tests/
