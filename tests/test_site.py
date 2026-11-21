@@ -51,3 +51,15 @@ def test_a_municipality_says_what_is_read_of_it():
     assert site.state_of("b.rs", seen, 3) == "адреса нова, још није читана"  # the list changed since the last look
     assert site.state_of("a.rs", seen, 3) == "читамо" and site.state_of("a.rs", seen, 0) == "још не умемо"
     assert site.state_of("a.rs", {"domain": "a.rs", "answers": ""}, 0) == "не одговара"
+
+
+def test_what_is_ahead_comes_first_by_its_nearest_day(tmp_path):
+    out = tmp_path / "s"
+    site.build(out, datetime.date(2026, 11, 21))
+    home = (out / "cir" / "index.html").read_text(encoding="utf-8")
+    ahead = home.split("У општинама: предстоји")[1].split("У општинама: остали позиви")[0]
+    assert "Дани у објави:" in ahead and "· одржано" not in ahead
+    row = {"title": "Јавна расправа", "url": "https://a.rs/1", "code": "1", "kind": "debate", "day": "2026-11-01",
+           "days": ["2026-11-15", "2026-12-04"]}
+    assert "Дани у објави: 15. 11. 2026., 4. 12. 2026." in site.item(row, {"1": "Ада"})
+    assert "Дани у објави" not in site.item({**row, "days": []}, {"1": "Ада"})

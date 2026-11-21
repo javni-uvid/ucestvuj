@@ -37,8 +37,14 @@ the same commit as the change.
   report on it; `announcements.held`) is kept, marked "одржано", and on the first page listed apart, under the
   calls and notices. Of the 1,530 titles 65 say so; of the 32 of the last 30 days, 3. A title that doesn't say
   so may still be news of a debate ("the mayor at the public debate on the budget"): the rule goes by words and
-  the pages say that. The first page says that the day is the announcement's, not the debate's: the deadline
-  and the place are in the announcement's text, which is not read yet.
+  the pages say that. The days of a debate are read from the announcement's text (below).
+- **What is ahead comes first** (21 Nov 2026, the maintainer: "we should also read when the debate is"). The
+  first page opens with the municipalities' announcements, not said to be held, whose text names today or a
+  later day, the nearest such day first (9 from 7 municipalities on 21 Nov 2026); then the other calls and
+  notices of the last 30 days; then what was held. Every announcement with days shows them as "Дани у објави"
+  ("the days the announcement names"), also on its municipality's page. The site does not say which day is the
+  debate and which a deadline, since the program can't tell (`docs/decisions/data.md`); the page says so and
+  sends the reader to the announcement, where the place and the hour are too.
 - **Open is what is under way today:** a state topic is listed as open when its phase under way, by the
   portal's own days (`consultations.phases`), ends today or later. Of the 181 topics the portal kept as not
   ended on 21 Nov 2026, 7 were.
