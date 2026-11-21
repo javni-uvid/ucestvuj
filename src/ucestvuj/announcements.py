@@ -40,6 +40,22 @@ def kind(title: str) -> str:
     return next((name for name, pattern in KINDS if pattern.search(low)), "")
 
 
+# What an announcement is about, by its title's words; the first that matches. Read in Latin, lower case. A plan
+# comes before the environment: a plan's inspection names its environmental report in the same title.
+TOPICS = (
+    ("budget", re.compile(r"bud[zž]et|buđet|rebalans|zavr[sš]n\w+ ra[cč]un")),
+    ("taxes", re.compile(r"porez|taks|naknad|cen\w+ kvadratn")),
+    ("plans", re.compile(r"regulacij|\bpdr\b|\bpgr\b|\bgup\b|prostorn\w+ plan|urbanisti|plansk\w+ dokument|komasacij|\bplan\w* detaljn|\bplan\w* generaln")),
+    ("environment", re.compile(r"procen\w+ uticaja|[zž]ivotn\w+ sredin|za[sš]tit\w+ prirode|otpad|za[sš]ti[cć]en\w+ podru[cč]j")),
+    ("development", re.compile(r"strategij|plan\w* razvoja|akcion\w+ plan|program\w* razvoja|srednjoro[cč]n|plan\w* javnog zdravlja")),
+)
+
+
+def topic(title: str) -> str:
+    low = latin(title).lower()
+    return next((name for name, pattern in TOPICS if pattern.search(low)), "other")
+
+
 def held(title: str) -> bool:
     """Whether the title itself says the debate or the inspection was held. A title that doesn't say so may
     still be news of one: only the municipality's own page tells."""

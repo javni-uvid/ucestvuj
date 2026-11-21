@@ -27,20 +27,42 @@ h2 { font: 700 var(--ju-t-6)/1.2 var(--ju-serif); margin: 2.4rem 0 .6rem; }
 .crumbs { margin-top: 1.4rem; }
 .note { color: var(--ju-muted); border-left: 3px solid var(--ju-line); padding-left: .9rem; }
 
-/* A list of announcements or topics: the day, the place, the kind, then the title, which leads to the source. */
-.items { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ju-line); }
-.items li { display: grid; grid-template-columns: 7.5rem 1fr; gap: .1rem 1rem; padding: .8rem 0; border-bottom: 1px solid var(--ju-line); }
-.items .when { grid-row: span 3; color: var(--ju-muted); font-size: var(--ju-t-2); padding-top: .15rem; font-variant-numeric: tabular-nums; }
-.items .where { font-weight: 600; font-size: var(--ju-t-2); }
-.items .kind { color: var(--ju-muted); font-size: var(--ju-t-1); text-transform: uppercase; letter-spacing: .04em; }
-.items .title { overflow-wrap: anywhere; }
-.items .days { grid-column: 2; font-size: var(--ju-t-2); font-variant-numeric: tabular-nums; }
-.items .title + .days { margin-top: .25rem; }
-@media (max-width: 560px) {
-  .items li { grid-template-columns: 1fr; }
-  .items .when { grid-row: auto; }
-  .items .days { grid-column: auto; }
+/* A row of a list answers three questions, each in its own place: where (the municipality, in the serif), what
+   about (the title in the source's words, with the kind and the topic as small labels) and when (each period or
+   day with what it is of). On a wide page "when" stands in a column of its own, so the eye runs down the days. */
+.cards { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ju-fg); }
+.card { display: grid; grid-template-columns: minmax(0, 1fr) 19rem; gap: .3rem 2rem; padding: 1.1rem 0; border-bottom: 1px solid var(--ju-line); }
+.card[hidden] { display: none; }
+.card p, .card ul { margin: 0; padding: 0; list-style: none; }
+.card .where { font: 700 var(--ju-t-4)/1.25 var(--ju-serif); }
+.card .where a { text-decoration: none; }
+.card .where a:hover { text-decoration: underline; }
+.card .where span { display: block; font: 400 var(--ju-t-2)/1.4 var(--ju-sans); color: var(--ju-muted); }
+.card .title { display: block; margin: .25rem 0 .5rem; overflow-wrap: anywhere; }
+.chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.chip { font-size: var(--ju-t-1); line-height: 1.2; padding: .2rem .5rem; border: 1px solid var(--ju-line); border-radius: 999px; color: var(--ju-muted); white-space: nowrap; }
+.chip.over { border-color: var(--ju-fg); color: var(--ju-fg); }
+.kada { font-size: var(--ju-t-2); font-variant-numeric: tabular-nums; border-left: 3px solid var(--ju-line); padding-left: .9rem; align-self: start; }
+.kada .next { font-weight: 700; margin-bottom: .3rem; }
+.kada .when li + li { margin-top: .3rem; }
+.kada .when b { display: block; font-weight: 600; }
+.kada .none, .kada .pub { color: var(--ju-muted); }
+.kada .pub { font-size: var(--ju-t-1); margin-top: .45rem; }
+@media (max-width: 720px) {
+  .card { grid-template-columns: 1fr; }
+  .kada { margin-top: .5rem; }
 }
+
+/* The first page's choice: where, when, what kind, what about, and a word. Shown by the script that makes it work. */
+.filter { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .8rem 1rem; align-items: end;
+  background: var(--ju-card); border: 1px solid var(--ju-line); padding: 1rem; margin: 1.2rem 0 .8rem; }
+.filter[hidden] { display: none; }
+.filter label { min-width: 0; display: grid; gap: .25rem; font-size: var(--ju-t-1); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ju-muted); }
+.filter select, .filter input, .filter button { font: var(--ju-t-3)/1.2 var(--ju-sans); min-height: 44px; padding: .4rem .6rem; width: 100%;
+  color: var(--ju-fg); background: var(--ju-bg); border: 1px solid var(--ju-muted); border-radius: 4px; }
+.filter button { cursor: pointer; font-weight: 600; }
+.filter button:hover { border-color: var(--ju-fg); }
+#mesta p { margin: 0 0 .8rem; }
 
 .scroll { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: var(--ju-t-2); }

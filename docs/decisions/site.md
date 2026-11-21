@@ -10,15 +10,54 @@ the same commit as the change.
   (`ucestvuj site`). Every page asks search engines not to index it (`noindex`) and says it is a preview, with
   the day the data was read. The site is not in `osnova/design/sites.json`, so the family's other sites don't
   link it yet; its own bar and footer name it among them. A domain and the family's link are the maintainer's.
-- **Pages:** the first page (the municipalities' announcements of the last 30 days, then the state's topics
-  open today), the municipalities in the Serbian alphabet with what is read from each, a page for each
+- **Pages:** the first page (one list of what is ahead and of the last 30 days' announcements, with filters;
+  below), the municipalities in the Serbian alphabet with what is read from each, a page for each
   municipality with announcements (by year, newest first), the state's consultations, and the project
   (sources with the day each was read, the rules, what is not here yet).
 - **The look is the family's** (`osnova/design/osnova.css`: Literata and the system font, black on white, the
   bar and the footer block); `static/site.css` lays out the lists and tables and gives nothing a colour of its
   own. Written once in Cyrillic; the Latin edition is the same page turned letter by letter (`translit.py`),
-  its addresses untouched, at the root, the Cyrillic under `cir/`. No script on any page. The build fails on a
-  page that loads anything from another server, keeps a Cyrillic letter in the Latin text, or is over 1 MB.
+  its addresses untouched, at the root, the Cyrillic under `cir/`. One script, the site's own (below). The build
+  fails on a page that loads anything from another server, keeps a Cyrillic letter in the Latin text, or is
+  over 1 MB.
+
+## The first page: where, what about, when
+
+21 Nov 2026, the maintainer: "work out a fitting design for the site, where what matters to us is the location,
+what is debated and when; we need filters for places and time; think of what else is useful."
+
+- **One list, and every row answers the three questions in the same places:** where (the municipality's name in
+  the serif, linked to its page; for a state body "Република Србија" and the body), what about (the title in
+  the source's words, linked to the source, with the kind and the topic as small labels), and when (a column of
+  its own: each period or day with what it is of, then the day of publication). The state's open topics are in
+  the same list as the municipalities' announcements, as rows of the same shape.
+- **The order is by what a reader can still do:** what is under way or yet to start first, the nearest day
+  first; then the other announcements of the last 30 days, newest first, the held ones marked. The older ones
+  are on each municipality's page.
+- **Filters: place, time, kind, topic, a word in the title.** Place lists every municipality, read or not, and
+  the republic; a chosen place says what is read of it and links all of its announcements, and one that is not
+  read says so instead of showing an empty list. Time: under way or yet to start (the default), something
+  starts or ends within 7 days, published in the last 30 days. The choice is kept in the page's address
+  (`#mesto=80365&tema=budget`), so a reader can bookmark their municipality or send a link.
+- **The topic is read from the title by words** (`announcements.topic`): the budget; taxes, fees and prices;
+  urban and spatial plans; the environment; strategies and development plans; the rest. A plan comes before the
+  environment, since a plan's inspection names its environmental report in the same title.
+- **"The next day: in 2 days"** is counted in the reader's browser from their own today, so it is right on a
+  page built earlier.
+- **One script, the site's own** (`static/site.js`); this changes "no script on any page" of the same day,
+  since filters need one. It hides rows, counts the days and writes the choice into the address. It stores
+  nothing on the device and sends nothing (principle 5 holds: nothing from third parties). The page is whole
+  without it: the list in its order with every day written out, the filters hidden. The build fails on any
+  other script, on one written into a page and on an event attribute.
+- **The site is built again every morning** (the **pages** workflow), so that what is ahead and what is over
+  is right for a reader without the script.
+- **Location is the municipality for now.** The place of a debate (the hall, the address) is in the
+  announcement's text and is not read; the row sends the reader to the announcement for it.
+
+Thought of and not built, the maintainer's to choose: a calendar file per row and per municipality ("add to my
+calendar"); a feed per municipality of new calls; the place of the debate read from the text; the districts as
+a filter above the municipalities; a map. The first two are only worth it once the readings run by themselves,
+which they don't yet.
 
 ## What a page says
 

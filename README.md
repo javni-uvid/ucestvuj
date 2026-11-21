@@ -33,7 +33,7 @@ uv run pytest -q              # no test asks a source
 |---|---|---|
 | test | on push and pull requests | the test suite |
 | security | on code or workflow changes, Mondays, by hand | actionlint and zizmor (the workflows), pip-audit (the packages), CodeQL (the code) |
-| pages | on a push that changes the site or its data, and by hand | build the site and publish it to GitHub Pages |
+| pages | on a push that changes the site or its data, every morning, and by hand | build the site and publish it to GitHub Pages |
 | list | Tuesdays, and by hand | the list of the municipalities' sites copied from `javni-uvid/izborna-analiza`, which keeps it |
 | osnova | daily, and by hand | the organization's shared rules, look and tools copied into `osnova/` |
 
@@ -62,7 +62,7 @@ The family's (`osnova/principles.md`), whole in `AGENTS.md`.
 osnova/            the organization's shared rules, look and tools (a copy; changed in javni-uvid/osnova)
 docs/decisions/    the decisions by part; data.md has the sources
 src/ucestvuj/        the readers: opendata, consultations, sites, announcements (when: its periods and days); web; cli
-                   site.py, translit.py, static/: the site from data/
+                   site.py, translit.py, static/ (the look, and site.js: the first page's filters): the site from data/
 data/              what was read, and sources.json: where each file came from and when
 tests/
 tools/             one-line callers of osnova/tools/

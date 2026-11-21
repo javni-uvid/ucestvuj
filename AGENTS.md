@@ -67,4 +67,4 @@ One more, this project's own:
 Decided on 21 Nov 2026 (`docs/decisions/site.md`, `docs/decisions/data.md`): a debate that was held is shown as
 held, apart from the calls; public officials in a title are kept, a title naming an applicant is not shown; the
 periods and days of a debate are read from the announcement's text by a program (`when.py`), and only they are
-kept, never the text.
+kept, never the text; the first page is one list with filters, run by the site's one own script.

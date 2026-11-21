@@ -141,3 +141,15 @@ def test_what_is_ahead_is_the_nearest_day_still_to_come():
     assert when.ahead([period], "2026-11-29") == "" and when.ahead([], "2026-11-21") == ""
     assert when.ahead([started], "2026-11-21") == "2026-11-29" and when.ahead([started], "2026-11-30") == ""
     assert when.ahead([{**session, "what": ""}], "2026-11-21") == ""  # a day nothing names is shown, not counted
+
+
+def test_a_title_says_what_the_announcement_is_about():
+    for title, about in (("ЈАВНИ ПОЗИВ ЗА УЧЕШЋЕ У ЈАВНОЈ РАСПРАВИ О НАЦРТУ ОДЛУКЕ О БУЏЕТУ", "budget"),
+                         ("Javna rasprava o drugom rebalansu budzeta", "budget"),
+                         ("Јавна расправа о Нацрту одлуке о локалним комуналним таксама", "taxes"),
+                         ("Јавни увид у Нацрт ПДР соларне електране и Извештај о стратешкој процени утицаја на животну средину", "plans"),
+                         ("Рани јавни увид поводом израде Плана генералне регулације", "plans"),
+                         ("Јавни увид Студије о процени утицаја на животну средину пројекта", "environment"),
+                         ("Јавна расправа о Локалном акционом плану за младе", "development"),
+                         ("Јавна расправа", "other")):
+        assert announcements.topic(title) == about, title

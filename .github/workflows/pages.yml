@@ -1,5 +1,6 @@
 # Builds the site from data/ (ucestvuj site) and publishes it to GitHub Pages: https://javni-uvid.github.io/ucestvuj/.
-# On a push to main that changes the site, its data or the family's look, and by hand. The build fails, and
+# On a push to main that changes the site, its data or the family's look, every morning (what is ahead and what
+# is over is counted from the day of the build, for a reader without the script), and by hand. The build fails, and
 # nothing is published, when a page would load anything from another server.
 name: pages
 
@@ -7,6 +8,8 @@ on:
   push:
     branches: [main]
     paths: ["src/**", "data/**", "osnova/design/**", "pyproject.toml", "uv.lock", ".github/workflows/pages.yml"]
+  schedule:
+    - cron: "17 2 * * *"
   workflow_dispatch:
 
 permissions: {}  # each job asks for what it needs
