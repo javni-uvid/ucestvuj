@@ -286,11 +286,13 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <p class="lead">Јавне расправе и јавни увиди које општине објављују на својим сајтовима, и консултације државних органа отворене за коментаре. Уз сваку: где је, о чему је и када. Наслов води на објаву саме институције.</p>
 <form id="filter" class="filter" hidden aria-label="Избор објава">
 <label>Место <select name="mesto"><option value="">Сва места</option><option value="{STATE}">Република Србија (државни органи)</option>{"".join(options)}</select></label>
+<details><summary>Време, врста, тема, реч</summary><div>
 <label>Када <select name="kada"><option value="ahead">Траје или тек почиње</option><option value="week">Нешто почиње или истиче за 7 дана</option><option value="recent">Објављено у последњих {RECENT_DAYS} дана</option></select></label>
 <label>Врста <select name="vrsta"><option value="">Све врсте</option>{"".join(f'<option value="{k}">{v}</option>' for k, v in KIND.items())}<option value="state">Консултације државе</option></select></label>
 <label>Тема <select name="tema"><option value="">Све теме</option>{"".join(f'<option value="{k}">{v}</option>' for k, v in TOPIC.items())}</select></label>
 <label>Реч у наслову <input type="search" name="rec" placeholder="нпр. соларна, вртић, порез"></label>
 <button type="reset">Поништи избор</button>
+</div></details>
 </form>
 <div id="reci" hidden><span data-k="found">Објава:</span><span data-k="next">Следећи дан:</span><span data-k="today">данас</span><span data-k="tomorrow">сутра</span><span data-k="in">за</span><span data-k="day">дан</span><span data-k="days">дана</span></div>
 <p id="broj" class="count" aria-live="polite">{len(rows_ahead)} објава у којима нешто траје или тек почиње, по најближем дану, па још {len(rest)} објава из последњих {RECENT_DAYS} дана, најновије прво.</p>

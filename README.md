@@ -60,7 +60,7 @@ The family's (`osnova/principles.md`), whole in `AGENTS.md`.
 
 ```
 osnova/            the organization's shared rules, look and tools (a copy; changed in javni-uvid/osnova)
-docs/decisions/    the decisions by part; data.md has the sources
+docs/decisions/    the decisions by part: data.md (the sources), site.md (the pages, the design rules), code.md
 src/ucestvuj/        the readers: opendata, consultations, sites, announcements (when: its periods and days); web; cli
                    site.py, translit.py, static/ (the look, and site.js: the first page's filters): the site from data/
 data/              what was read, and sources.json: where each file came from and when
