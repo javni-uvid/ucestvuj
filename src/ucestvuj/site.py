@@ -15,6 +15,7 @@ import re
 import shutil
 from pathlib import Path
 
+from ucestvuj import when
 from ucestvuj.announcements import held
 from ucestvuj.sites import REPORT
 from ucestvuj.translit import CYRILLIC, latin_page, text_of
@@ -29,6 +30,9 @@ NAME = "Учествуј"
 ABOUT = ("Јавне расправе и јавни увиди које општине објављују, и консултације државних органа отворене за коментаре, "
          "свака са објавом саме институције.")
 KIND = {"debate": "Јавна расправа", "inspection": "Јавни увид", "early_inspection": "Рани јавни увид"}
+# What a period or a day in an announcement is of, as the words before it say (when.CUES).
+WHAT = {"debate": "Јавна расправа", "inspection": "Јавни увид", "early_inspection": "Рани јавни увид", "session": "Јавна седница",
+        "meeting": "Састанак или презентација", "remarks": "Примедбе", "": "У објави"}
 RECENT_DAYS = 30
 # A title that names the one who asked for a plan or a study (an investor, an applicant) may name a private
 # person; the site then shows the kind of announcement and links the municipality's own page for its words
@@ -151,6 +155,19 @@ def frame(path: str, script: str, title: str, description: str, main: str, read:
 # ---- the pages' parts
 
 
+def period(p: dict) -> str:
+    """One period or day of an announcement, as words: "Јавни увид: од 30. 10. 2026. до 28. 11. 2026."."""
+    if p["from"] and p["to"] == p["from"]:
+        words = day(p["from"]) + (f' у {p["hour"]}' if p["hour"] else "")
+    elif p["from"] and p["to"]:
+        words = f'од {day(p["from"])} до {day(p["to"])}'
+    elif p["to"]:
+        words = f'до {day(p["to"])}'
+    else:
+        words = f'од {day(p["from"])}' + (f', {p["days"]} дана' if p["days"] else "")
+    return f'{WHAT[p["what"]]}: {words}'
+
+
 def item(a: dict, names: dict, with_place: bool = True) -> str:
     title = shown_title(a)
     words = (f'<a class="title" href="{esc(a["url"])}">{esc(title)}</a>' if title else
@@ -158,7 +175,7 @@ def item(a: dict, names: dict, with_place: bool = True) -> str:
     place = f'<a class="where" href="{{home}}opstina/{esc(a["code"])}.html">{esc(names[a["code"]])}</a>' if with_place else ""
     when = f'<span class="when">{day(a["day"])}</span>' if a["day"] else '<span class="when">без датума</span>'
     over = " · одржано" if held(a["title"]) else ""
-    named = f'<span class="days">Дани у објави: {", ".join(day(d) for d in a["days"])}</span>' if a.get("days") else ""
+    named = "".join(f'<span class="days">{period(p)}</span>' for p in a.get("when", []))
     return f'<li>{when}{place}<span class="kind">{KIND[a["kind"]]}{over}</span>{words}{named}</li>'
 
 
@@ -198,7 +215,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
     recent = sorted((a for rows in by_code.values() for a in rows if a["day"] >= since),
                     key=lambda a: (a["day"], azbuka(names[a["code"]])), reverse=True)
     # Ahead: an announcement not said to be over whose text names today or a later day, the nearest such day first.
-    ahead_of = lambda a: next((d for d in a.get("days", []) if d >= today.isoformat()), "")
+    ahead_of = lambda a: when.ahead(a.get("when", []), today.isoformat())
     ahead = sorted((a for rows in by_code.values() for a in rows if ahead_of(a) and not held(a["title"])),
                    key=lambda a: (ahead_of(a), azbuka(names[a["code"]]), a["url"]))
     called = [a for a in recent if not held(a["title"]) and not ahead_of(a)]
@@ -214,10 +231,10 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <h1>Где и када можеш да кажеш шта мислиш</h1>
 <p class="lead">Јавне расправе и јавни увиди које општине објављују на својим сајтовима, и консултације државних органа отворене за коментаре. Сваки ред води на објаву саме институције.</p>
 <h2>У општинама: предстоји</h2>
-<p class="count">{len(ahead)} објава из {len({a["code"] for a in ahead})} општина које у тексту помињу данашњи или каснији дан, по најближем таквом дану. Дане програм чита из текста објаве: то може бити дан расправе или јавне седнице, крај јавног увида или рок за примедбе. Шта је који, и где, пише у објави. Објаве читамо са сајтова {len(by_code)} општина од {len(names)}; <a href="{{home}}opstine.html">којих и зашто</a>.</p>
+<p class="count">{len(ahead)} објава из {len({a["code"] for a in ahead})} општина у којима нешто још траје или тек почиње, по најближем дану. Периоде и дане програм чита из текста објаве, са оним на шта се по речима објаве односе; место и остало пише у објави. Објаве читамо са сајтова {len(by_code)} општина од {len(names)}; <a href="{{home}}opstine.html">којих и зашто</a>.</p>
 <ol class="items">{"".join(item(a, names) for a in ahead)}</ol>
 <h2>У општинама: остали позиви и огласи, последњих {RECENT_DAYS} дана</h2>
-<p class="count">{len(called)} објава из {len({a["code"] for a in called})} општина, најновије прво: дани које помињу су прошли, или их у тексту нисмо нашли (текст је у приложеном документу, дан је написан без године, или објаву читамо само по наслову).</p>
+<p class="count">{len(called)} објава из {len({a["code"] for a in called})} општина, најновије прво: оно што наводе је прошло, или у тексту нисмо нашли дан (текст је у приложеном документу, дан је написан без године, или објаву читамо само по наслову).</p>
 <ol class="items">{"".join(item(a, names) for a in called)}</ol>
 <h2>У општинама: одржано</h2>
 <p class="count">{len(over)} објава чији наслов каже да је расправа или увид одржан: вест о томе или извештај.</p>
@@ -263,7 +280,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <p class="crumbs"><a href="{{home}}opstine.html">Општине</a></p>
 <h1>{esc(names[code])}</h1>
 <p class="lead">{len(found)} објава о јавним расправама и јавним увидима са сајта {link}, најновије прво.</p>
-<p class="note">Наслови су речи општине. „Дани у објави“ су дани које програм налази у њеном тексту, од дана објаве надаље: шта је који, пише у објави. „Одржано“ стоји уз објаву чији наслов каже да је расправа или увид одржан; и објава без те ознаке може бити вест, а не позив: прочитајте је на сајту општине. Наслов који именује подносиоца захтева (инвеститора) не преносимо.</p>
+<p class="note">Наслови су речи општине. Периоде и дане испод наслова програм чита из текста објаве; „У објави“ стоји уз дан за који из речи око њега није јасно на шта се односи. „Одржано“ стоји уз објаву чији наслов каже да је расправа или увид одржан; и објава без те ознаке може бити вест, а не позив: прочитајте је на сајту општине. Наслов који именује подносиоца захтева (инвеститора) не преносимо.</p>
 {"".join(parts)}
 """)
 
@@ -297,14 +314,14 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <li><b>Сваки ред води на објаву саме институције.</b> Сајт не преписује објаве, само њихов наслов, дан и адресу.</li>
 <li><b>Наслов је речи општине,</b> пренет како је написан; на латиничком издању пресловљен. Јавни функционер у наслову остаје како га је општина навела. Наслов који именује подносиоца захтева (инвеститора, носиоца пројекта) не преносимо, јер може именовати приватно лице: уместо њега стоји веза ка објави.</li>
 <li><b>Одржано је оно за шта наслов то каже</b> („одржана“, „извештај о спроведеној јавној расправи“). Остале објаве су позиви и огласи, а понека и вест коју наслов не одаје.</li>
-<li><b>Дане читамо из текста објаве, а текст не преносимо.</b> „Дани у објави“ су дани које објава помиње од дана кад је објављена: расправа, јавна седница, крај увида, рок за примедбе. Програм не зна шта је који, па их само наводи; дан написан без године не узима. Нађете ли погрешан дан, пријавите га.</li>
+<li><b>Када је шта, читамо из текста објаве, а текст не преносимо.</b> Програм налази периоде („од … до …“), рокове („до …“) и дане са часом, и уз сваки ставља оно о чему говоре речи испред њега: јавни увид, јавна расправа, јавна седница, примедбе. Где то из речи није јасно, пише само „У објави“. Дан написан без године не узима, а трајање („30 дана од …“) не прерачунава у крајњи дан. Оно што се завршило пре објаве не наводи. Нађете ли погрешан дан, пријавите га.</li>
 <li><b>Отворено је оно чија фаза траје данас,</b> по датумима самог портала.</li>
 <li><b>Списак општинских сајтова је један,</b> заједнички са Изборним подацима: адреса нађена или исправљена тамо стиже и овде.</li>
 </ul>
 <h2>Шта још није овде</h2>
 <ul>
 <li>Водичи кроз то како се учествује (збор грађана, грађанска иницијатива, јавна расправа, захтев за информације од јавног значаја), сваки корак са чланом закона на коме почива.</li>
-<li>Општине чије објаве још не умемо да прочитамо, и место и час расправе: објава их наводи у тексту, а ми из њега читамо само дане.</li>
+<li>Општине чије објаве још не умемо да прочитамо, и место расправе: објава га наводи у тексту, а ми из њега читамо само када је шта.</li>
 <li>Јавни увиди у планове које објављују министарство, покрајина и заводи за урбанизам, и процене утицаја на животну средину.</li>
 </ul>
 <p>Грешку пријавите на <a href="{REPO}/issues">GitHub-у</a>.</p>

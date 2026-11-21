@@ -39,12 +39,15 @@ the same commit as the change.
   so may still be news of a debate ("the mayor at the public debate on the budget"): the rule goes by words and
   the pages say that. The days of a debate are read from the announcement's text (below).
 - **What is ahead comes first** (21 Nov 2026, the maintainer: "we should also read when the debate is"). The
-  first page opens with the municipalities' announcements, not said to be held, whose text names today or a
-  later day, the nearest such day first (9 from 7 municipalities on 21 Nov 2026); then the other calls and
-  notices of the last 30 days; then what was held. Every announcement with days shows them as "Дани у објави"
-  ("the days the announcement names"), also on its municipality's page. The site does not say which day is the
-  debate and which a deadline, since the program can't tell (`docs/decisions/data.md`); the page says so and
-  sends the reader to the announcement, where the place and the hour are too.
+  first page opens with the municipalities' announcements, not said to be held, in which something named is
+  still under way or yet to start, the nearest day first (12 from 7 municipalities on 21 Nov 2026); then the
+  other calls and notices of the last 30 days; then what was held.
+- **A row says what is when, as the announcement does** (21 Nov 2026, the maintainer, on a row that showed one
+  bare date for a month-long inspection): under the title, a line for each period or day with what it is of
+  ("Јавни увид: од 30. 10. 2026. до 28. 11. 2026.", "Јавна седница: 8. 12. 2026. у 13:00", "Примедбе: до …",
+  "Јавни увид: од 30. 10. 2026., 30 дана"), also on the municipality's page. A period or day the words don't
+  name is shown as "У објави" and does not put the announcement among what is ahead. How they are read is in
+  `docs/decisions/data.md`; the project's page says it in short and asks for a wrong one to be reported.
 - **Open is what is under way today:** a state topic is listed as open when its phase under way, by the
   portal's own days (`consultations.phases`), ends today or later. Of the 181 topics the portal kept as not
   ended on 21 Nov 2026, 7 were.

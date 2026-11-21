@@ -62,7 +62,9 @@ One more, this project's own:
 - The site's address.
 - Which mechanisms come first (`docs/decisions/data.md` has a proposal).
 - Whether a municipality's statute is read by a model and checked by a person, or by a person only.
+- Whether a model reads an announcement's text a second time, beside the program (`docs/decisions/data.md`).
 
 Decided on 21 Nov 2026 (`docs/decisions/site.md`, `docs/decisions/data.md`): a debate that was held is shown as
 held, apart from the calls; public officials in a title are kept, a title naming an applicant is not shown; the
-days a debate is on are read from the announcement's text by a program, and only the days are kept.
+periods and days of a debate are read from the announcement's text by a program (`when.py`), and only they are
+kept, never the text.
