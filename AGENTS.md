@@ -62,8 +62,7 @@ One more, this project's own:
 - The site's address.
 - Which mechanisms come first (`docs/decisions/data.md` has a proposal).
 - Whether a municipality's statute is read by a model and checked by a person, or by a person only.
-- Whether a debate's day and deadline are read from an announcement's text, and who checks them: until then
-  the site says when a call was published, not whether it is still open (`docs/decisions/data.md`).
 
-Decided on 21 Nov 2026 (`docs/decisions/site.md`): a debate that was held is shown as held, apart from the
-calls; public officials in a title are kept, a title naming an applicant is not shown.
+Decided on 21 Nov 2026 (`docs/decisions/site.md`, `docs/decisions/data.md`): a debate that was held is shown as
+held, apart from the calls; public officials in a title are kept, a title naming an applicant is not shown; the
+days a debate is on are read from the announcement's text by a program, and only the days are kept.

@@ -6,9 +6,11 @@ inspections of plans. Read where a site offers a list a program can ask for:
   (`/wp-json/wp/v2/search`) finds them, without a day;
 - any site with a feed gives its newest entries, kept when their title says what they are.
 
-A site with neither is not read here (its first page's links are in sites.json). Only the title, the day and
-the address are kept; the announcement itself stays on the municipality's site."""
+A site with neither is not read here (its first page's links are in sites.json). Only the title, the day, the
+address and the days the announcement's text names are kept; the text itself, which may name people and give
+their addresses, is read and not kept, and stays on the municipality's site."""
 
+import datetime
 import html
 import re
 import urllib.parse
@@ -45,28 +47,75 @@ def held(title: str) -> bool:
     return bool(_HELD.search(latin(title).lower()))
 
 
+_MONTHS_SR = ("januar", "februar", "mart", "april", "maj", "jun", "jul", "avgust", "septemb", "oktob", "novemb", "decemb")
+# A day as the announcements write it: "28.10.2026.", "8. децембра 2026. године", and, in a range, without its
+# year ("од 12. октобра до 23. новембра 2026."). Some sites' text has spaces inside a number ("2 0 . новембра
+# 202 6 ."), so one space is let between the digits. Read in Latin, lower case.
+_DATE = re.compile(r"(?<![\d./,:])(?P<d>[0-3]? ?\d) ?\. ?"
+                   r"(?:(?P<m>[01]? ?\d) ?\. ?|(?P<name>" + "|".join(_MONTHS_SR) + r")[a-z]{0,3}(?![a-zčćžšđ])\.? ?)"
+                   r"(?:(?P<y>20 ?\d ?\d)(?!\d))?")
+_NEAR = 12  # how far a day without a year may stand from the dated day that ends its range ("... do ")
+AHEAD = 400  # a day further than this after the announcement is not the debate's
+
+
+def days(text: str, published: str) -> list[str]:
+    """The days an announcement's text names, from the day it was published on: the debate, the session, the end
+    of the inspection, the deadline for remarks. Which is which only the text says; the days before it (the
+    decision's, the session's that adopted the draft) are left out. Nothing without the day of publication,
+    and a day without a year counts only as the start of a range whose end has one."""
+    if not published or not text:
+        return []
+    first = datetime.date.fromisoformat(published[:10])
+    last = first + datetime.timedelta(days=AHEAD)
+    found, after = set(), None  # `after`: the match that follows, as (start, year, month)
+    for m in reversed(list(_DATE.finditer(latin(text).lower()))):
+        digits = lambda s: int(s.replace(" ", ""))
+        month = digits(m["m"]) if m["m"] else _MONTHS_SR.index(m["name"]) + 1
+        if m["y"]:
+            year = digits(m["y"])
+        elif after and after[0] - m.end() <= _NEAR:
+            year = after[1] - (month > after[2])  # "од 20. децембра до 15. јануара 2027."
+        else:
+            after = None
+            continue
+        after = (m.start(), year, month)
+        try:
+            day_ = datetime.date(year, month, digits(m["d"]))
+        except ValueError:
+            continue
+        if first <= day_ <= last:
+            found.add(day_.isoformat())
+    return sorted(found)
+
+
 def clean(text: str) -> str:
     return " ".join(html.unescape(_TAGS.sub(" ", text or "")).split())
 
 
-def entry(title: str, url: str, day: str, via: str) -> dict | None:
-    """One announcement, or nothing when its title doesn't say it is a debate or an inspection."""
+def entry(title: str, url: str, day: str, via: str, text: str = "") -> dict | None:
+    """One announcement, or nothing when its title doesn't say it is a debate or an inspection. Of its text only
+    the days it names are kept."""
     title = clean(title)
     what = kind(title)
     if not what or not url.startswith("http"):
         return None
-    return {"kind": what, "budget": bool(_BUDGET.search(title.lower())), "title": title, "day": day[:10], "url": url, "via": via}
+    return {"kind": what, "budget": bool(_BUDGET.search(title.lower())), "title": title, "day": day[:10], "url": url,
+            "via": via, "days": days(clean(text), day)}
 
 
 def from_wordpress(base: str) -> list[dict]:
     found = []
     for words in ASKED:
         q = urllib.parse.quote(words)
-        try:
-            posts = web.get_json(f"{base}wp-json/wp/v2/posts?search={q}&per_page=50&orderby=date&_fields=date,link,title", timeout=30)
-            found += [entry(p["title"]["rendered"], p["link"], p["date"], "wordpress posts") for p in posts]
-        except Exception:
-            pass  # a site that closed this door may still answer the next
+        asked = f"{base}wp-json/wp/v2/posts?search={q}&per_page=50&orderby=date&_fields=date,link,title"
+        for fields in (",content", ""):  # with the text; a site that won't give 50 texts at once, without
+            try:
+                posts = web.get_json(asked + fields, timeout=40)
+                found += [entry(p["title"]["rendered"], p["link"], p["date"], "wordpress posts",
+                                p.get("content", {}).get("rendered", "")) for p in posts]
+                break
+            except Exception:
+                pass  # a site that closed this door may still answer the next
         try:
             hits = web.get_json(f"{base}wp-json/wp/v2/search?search={q}&per_page=50&_fields=title,url", timeout=30)
             found += [entry(h["title"], h["url"], "", "wordpress search") for h in hits]
@@ -89,7 +138,8 @@ def from_feed(feed: str) -> list[dict]:
         link = parts.get("link")
         url = (link.text or link.get("href") or "").strip() if link is not None else ""
         when = next((parts[k].text or "" for k in ("pubDate", "published", "updated", "date") if k in parts), "")
-        found.append(entry(parts["title"].text if "title" in parts else "", url, day(when), "feed"))
+        text = " ".join(parts[k].text or "" for k in ("encoded", "content", "description", "summary") if k in parts)
+        found.append(entry(parts["title"].text if "title" in parts else "", url, day(when), "feed", text))
     return [f for f in found if f]
 
 
@@ -106,14 +156,16 @@ def day(when: str) -> str:
 
 
 def of_site(site: dict) -> list[dict]:
-    """One municipality's announcements, each address once (the reading with a day wins), newest first."""
+    """One municipality's announcements, each address once (the reading with a day wins, then the one whose
+    text named more days), newest first."""
     if not site.get("answers"):
         return []
     base = f'{site["answers"]}://{site["domain"]}/'
     found = (from_wordpress(base) if site["system"] == "wordpress" else []) + (from_feed(site["feed"]) if site.get("feed") else [])
     best: dict[str, dict] = {}
     for f in found:
-        if f["url"] not in best or (f["day"] and not best[f["url"]]["day"]):
+        weight = lambda e: (bool(e["day"]), len(e["days"]))
+        if f["url"] not in best or weight(f) > weight(best[f["url"]]):
             best[f["url"]] = f
     rows = sorted(best.values(), key=lambda f: (f["day"], f["url"]), reverse=True)
     return [{"code": site["code"], "municipality": site["name"], **f} for f in rows]

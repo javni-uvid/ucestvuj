@@ -73,3 +73,27 @@ def test_a_new_copy_of_the_list_says_what_it_changed():
     assert sites.changes(old, new) == ["Ариље: no address -> arilje.org.rs", "Бор: bor.rs -> no address",
                                        "Нова: added, n.rs", "Стара: left out"]
     assert sites.table('municipality_code,name,domain,note\n1,Ада,ada.org.rs,"a, b"\n')[0]["note"] == "a, b"
+
+
+def test_the_days_an_announcement_names_are_read_from_its_text():
+    days = announcements.days
+    # the session that adopted the draft is before the announcement; a range's first day takes its end's year
+    text = ("на седници одржаној 22.09.2026. године, утврдила Нацрт. 1. ЈАВНИ УВИД обавиће се од 12. октобра до "
+            "23. новембра 2026. године, сваког радног дана од 9 до 18 часова. 2. ЈАВНА СЕДНИЦА одржаће се "
+            "8. децембра 2026. године у 13 часова (сала на 20. спрату). Закон („Службени гласник РС”, бр. 72/09, 9/20)")
+    assert days(text, "2026-10-29") == ["2026-11-23", "2026-12-08"]
+    assert days("одржаће се од 28.10.2026. до 11.11.2026. године, а седница 12.11.2026. године у 11,00 часова",
+                "2026-10-28") == ["2026-10-28", "2026-11-11", "2026-11-12"]
+    assert days("Javna rasprava traje od 20. decembra do 15. januara 2027. godine", "2026-12-18") == ["2026-12-20", "2027-01-15"]
+    assert days("почев од дана 2 0 . новембра 202 6 . године до дана 4 . децембра 202 6. године", "2026-11-20") == ["2026-11-20", "2026-12-04"]
+    # a day without a year is not guessed; an amount, a time and a law's number are not days
+    assert days("трајала је од 28.октобра до 11.новембра, у 10:00, износ 1.250.000,00, члана 4., 7. и 8. Одлуке, 31.11.2026.", "2026-10-28") == []
+    assert days("Јавни увид траје до 1. децембра 2026. године", "") == [] and days("", "2026-11-01") == []
+    assert days("рок је 1.12.2029.", "2026-11-01") == []  # too far ahead to be this announcement's
+
+
+def test_an_announcement_keeps_the_days_of_its_text_and_not_the_text():
+    a = announcements.entry("Јавни позив за јавну расправу", "https://a.rs/1", "2026-11-01T08:00:00", "wordpress posts",
+                            "<p>Примедбе на мејл господина Петра Петровића, p@a.rs, до 15.11.2026. године.</p>")
+    assert a["days"] == ["2026-11-15"] and "Петр" not in str(a) and "p@a.rs" not in str(a)
+    assert announcements.entry("Јавна расправа", "https://a.rs/2", "", "wordpress search")["days"] == []

@@ -92,7 +92,7 @@ Everything below is in `data/`, with where it came from and the day in `data/sou
 | `tasks.csv` | the ministry's tasks of local government | 1,203 tasks with area, legal basis, level and competent body. |
 | `consultations.json`, `consultation_institutions.json` | eKonsultacije | 679 topics (181 not ended) and the 204 institutions registered. |
 | `municipal_sites.csv`, `sites.json` | izborna-analiza's list; each site's first page | 157 sites, 152 answer: what each runs on, its feed, and its first page's links by what they lead to. |
-| `announcements.json` | the municipalities' own sites | 1,530 announcements of public debates (688), public inspections (582) and early public inspections (260) from 49 municipalities; 1,088 with a day; 32 in the last 30 days, from 18 municipalities. |
+| `announcements.json` | the municipalities' own sites | 1,530 announcements of public debates (688), public inspections (582) and early public inspections (260) from 49 municipalities; 1,088 with a day; 32 in the last 30 days, from 18 municipalities. Read again on 21 Nov 2026 with the days each text names (below). |
 
 ## What the reading showed
 
@@ -133,14 +133,34 @@ Everything below is in `data/`, with where it came from and the day in `data/sou
 - **A new address is not read by the workflow.** `ucestvuj sites` and `ucestvuj announcements` are still run by
   hand; until then the site says the address is new.
 
+## The days an announcement names
+
+21 Nov 2026, the maintainer: "we should also read when the debate is".
+
+- **Read from the announcement's own text, by a program** (`announcements.days`): a WordPress site gives the
+  text with the post in the same answer, a feed with the entry, so no site is asked more often than before.
+  The same 1,530 announcements; 751 of the 1,088 with a day of publication name at least one day.
+- **Only the days are kept, never the text.** A text names people and gives their e-mail addresses (principle
+  4); `announcements.json` gets a list of days per announcement and nothing else of the text.
+- **Which days:** every day written whole ("28.10.2026.", "8. децембра 2026. године"), from the day of
+  publication to 400 days after it. The days before publication are the decision's and the adopting session's,
+  not the debate's. A day without a year counts only as the start of a range whose end has one ("од 12.
+  октобра до 23. новембра 2026."); otherwise it is not guessed. One space inside a number is read through
+  ("2 0 . новембра 202 6 ."), as two sites' text has them.
+- **The program does not say which day is what.** A text gives the debate's days, a session's, the end of an
+  inspection, a deadline for remarks, and sometimes another day (the day a decision takes effect). The site
+  lists them as "the days the announcement names" and sends the reader to the announcement for the rest.
+- **Not read:** a duration ("30 days from 30.10.2026." gives the first day only; the end is not counted out),
+  a text in an attached PDF, a day without a year, and the announcements read by title only.
+- **Nobody checks each day by hand;** a wrong one is corrected by a reader's report and a change of the rule.
+
 ## Where the rest of what a citizen can take part in is
 
 Not read yet; in the order of what each would add.
 
-0. **An announcement's own text** (21 Nov 2026): the day, the place and the deadline of a debate are in the
-   text, not the title, so the site can say that a call was published and not whether it is still open. The
-   WordPress sites give the text with the post; how a day is taken from free text, and who checks it, is the
-   maintainer's decision (AGENTS.md).
+0. **An announcement's place and hour, and the days of the announcements read by title only** (the `ls.gov.rs`
+   kind of content, 442 announcements, comes without a text and without a day; a text in an attached document
+   is not opened).
 1. **A topic's dates and documents on eKonsultacije** (its phases and methods): turns the list into "open until".
 2. **The list pages behind the first page's links** on the sites that have no search to ask (`sites.json`), the
    `ls.gov.rs` category first, as its 15 sites are built alike.

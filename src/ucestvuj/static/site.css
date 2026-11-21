@@ -34,9 +34,11 @@ h2 { font: 700 var(--ju-t-6)/1.2 var(--ju-serif); margin: 2.4rem 0 .6rem; }
 .items .where { font-weight: 600; font-size: var(--ju-t-2); }
 .items .kind { color: var(--ju-muted); font-size: var(--ju-t-1); text-transform: uppercase; letter-spacing: .04em; }
 .items .title { overflow-wrap: anywhere; }
+.items .days { grid-column: 2; font-size: var(--ju-t-2); font-variant-numeric: tabular-nums; }
 @media (max-width: 560px) {
   .items li { grid-template-columns: 1fr; }
   .items .when { grid-row: auto; }
+  .items .days { grid-column: auto; }
 }
 
 .scroll { overflow-x: auto; }
