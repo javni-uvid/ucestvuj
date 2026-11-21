@@ -4,7 +4,9 @@ site is: whether it answers, what it runs on, whether it has a feed, and which o
 what a citizen can take part in. One request per site.
 
 The list of sites is javni-uvid/izborna-analiza's (`data/municipal_sites.csv`: the domain of each electoral
-commission's e-mail in RIK's address book), copied to `data/municipal_sites.csv`."""
+commission's e-mail in RIK's address book, corrected there by hand and by its weekly watch), copied to
+`data/municipal_sites.csv` by `ucestvuj list`. One list for both projects: a site found or corrected is written
+there, and comes here with the next copy."""
 
 import csv
 import html
@@ -30,12 +32,44 @@ KINDS = {
     "plans": ("urbanistič", "урбанистич", "planska dokument", "планска документ", "prostorni plan", "просторни план"),
     "petition": ("peticij", "петициј", "inicijativ", "иницијатив", "predlozi građana", "предлози грађана"),
 }
+LIST = "https://raw.githubusercontent.com/javni-uvid/izborna-analiza/main/data/municipal_sites.csv"
+REPORT = "https://github.com/javni-uvid/izborna-analiza/issues/new?title=Sajt%20op%C5%A1tine%3A%20"
 _KIND = {kind: re.compile("|".join(words)) for kind, words in KINDS.items()}
 _A = re.compile(r'<a\b[^>]*?\bhref\s*=\s*["\']([^"\'#]+)["\'][^>]*>(.*?)</a>', re.S | re.I)
 _TAGS = re.compile(r"<[^>]+>")
 _FEED = re.compile(r'<link\b[^>]*type=["\']application/(?:rss|atom)\+xml["\'][^>]*>', re.I)
 _HREF = re.compile(r'href=["\']([^"\']+)["\']', re.I)
 _GENERATOR = re.compile(r'<meta\b[^>]*name=["\']generator["\'][^>]*content=["\']([^"\']+)["\']', re.I)
+
+
+def table(text: str) -> list[dict]:
+    return list(csv.DictReader(text.splitlines()))
+
+
+def changes(old: list[dict], new: list[dict]) -> list[str]:
+    """What a new copy of the list changes, one line per municipality: an address found, changed or lost, and a
+    municipality added or left out."""
+    was = {r["municipality_code"]: r for r in old}
+    out = []
+    for r in new:
+        before = was.pop(r["municipality_code"], None)
+        if before is None:
+            out.append(f'{r["name"]}: added, {r["domain"] or "no address"}')
+        elif before["domain"] != r["domain"]:
+            out.append(f'{r["name"]}: {before["domain"] or "no address"} -> {r["domain"] or "no address"}')
+    return out + [f'{r["name"]}: left out' for r in was.values()]
+
+
+def bring(sites_csv: Path) -> list[str]:
+    """Copy izborna-analiza's list over ours and say what changed. A list that lost its columns or most of its
+    rows is not copied."""
+    raw = web.get(LIST, timeout=30)
+    new = table(raw.decode("utf-8-sig"))
+    old = table(sites_csv.read_text(encoding="utf-8")) if sites_csv.exists() else []
+    if not new or not {"municipality_code", "name", "domain"} <= set(new[0]) or len(new) < 0.9 * len(old):
+        raise ValueError(f"the list at {LIST} is not what it was: {len(new)} rows, columns {list(new[0]) if new else []}")
+    sites_csv.write_text("\n".join(raw.decode("utf-8-sig").splitlines()) + "\n", encoding="utf-8", newline="\n")
+    return changes(old, new)
 
 
 def decode(raw: bytes) -> str:

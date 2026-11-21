@@ -19,6 +19,7 @@ source gave and what is not read.
 uv sync
 uv run ucestvuj opendata        # the bodies, the municipalities and local government's tasks, from data.gov.rs
 uv run ucestvuj consultations   # every topic on eKonsultacije
+uv run ucestvuj list            # the municipalities' sites: izborna-analiza's list, copied (says what changed)
 uv run ucestvuj sites           # what each municipality's own site is and links to (one request per site)
 uv run ucestvuj announcements   # public debates and inspections the municipalities announce (after `sites`)
 uv run ucestvuj site --out _site   # the site from data/ (fails on a page that loads anything from elsewhere)
@@ -32,9 +33,14 @@ uv run pytest -q              # no test asks a source
 | test | on push and pull requests | the test suite |
 | security | on code or workflow changes, Mondays, by hand | actionlint and zizmor (the workflows), pip-audit (the packages), CodeQL (the code) |
 | pages | on a push that changes the site or its data, and by hand | build the site and publish it to GitHub Pages |
+| list | Tuesdays, and by hand | the list of the municipalities' sites copied from `javni-uvid/izborna-analiza`, which keeps it |
 | osnova | daily, and by hand | the organization's shared rules, look and tools copied into `osnova/` |
 
 The readings are run by hand for now; no workflow asks a source.
+
+**A municipality's site that is missing or wrong** is reported to
+[izborna-analiza](https://github.com/javni-uvid/izborna-analiza/issues): the list is one for both projects, and
+a correction there reaches this site with the next copy.
 
 ## What it will hold
 

@@ -15,6 +15,8 @@ people. The rules of work and the principles are here; each part's decisions are
   the maintainer's request); a domain and the family's link to it are the maintainer's decisions.
 - **The tests are `uv run pytest -q`**; the **test** workflow runs them on every pull request and on `main`,
   and **security** checks the workflows, the packages and the code. On Windows set `PYTHONUTF8=1`.
+- **The list of the municipalities' sites is izborna-analiza's** (`data/municipal_sites.csv` is a copy, brought by
+  `ucestvuj list` and the **list** workflow): an address found or corrected is written there, never here.
 - **Ask a source little,** name the project in the User-Agent (`web.AGENT`), read incrementally. The readings
   are run by hand for now (README.md, Commands); the tests (`uv run pytest -q`) ask no source.
 - **Talk to the maintainer in Serbian** (Latin script), briefly. Code, comments and docs are in English.
@@ -60,6 +62,8 @@ One more, this project's own:
 - The site's address.
 - Which mechanisms come first (`docs/decisions/data.md` has a proposal).
 - Whether a municipality's statute is read by a model and checked by a person, or by a person only.
-- Which announcements count as a call to take part (a title may be news that a debate was held). Titles that
-  name a person are decided: public officials are kept, a title naming an applicant is not shown
-  (`docs/decisions/site.md`, 21 Nov 2026).
+- Whether a debate's day and deadline are read from an announcement's text, and who checks them: until then
+  the site says when a call was published, not whether it is still open (`docs/decisions/data.md`).
+
+Decided on 21 Nov 2026 (`docs/decisions/site.md`): a debate that was held is shown as held, apart from the
+calls; public officials in a title are kept, a title naming an applicant is not shown.
