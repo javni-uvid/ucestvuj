@@ -1,6 +1,7 @@
 """The site, built from data/ into static pages in the family's look (osnova/design/), in Cyrillic (cir/) and
 Latin (the default). Written once in Cyrillic; the Latin edition is the same page turned letter by letter, its
-addresses untouched. Nothing on a page comes from another server, and nothing needs a script.
+addresses untouched. Nothing on a page comes from another server, and nothing needs a script: the one script,
+the site's own (static/site.js), only filters the first page's list, which is whole without it.
 
 Pages: the first page (what is open now), the municipalities, a page for each municipality with
 announcements, the state's consultations, and the project. A preview for the maintainer: the pages ask search
@@ -13,12 +14,13 @@ import html
 import json
 import re
 import shutil
+import unicodedata
 from pathlib import Path
 
 from ucestvuj import when
-from ucestvuj.announcements import held
+from ucestvuj.announcements import held, topic as topic_of
 from ucestvuj.sites import REPORT
-from ucestvuj.translit import CYRILLIC, latin_page, text_of
+from ucestvuj.translit import CYRILLIC, latin, latin_page, text_of
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data"
@@ -33,6 +35,12 @@ KIND = {"debate": "Јавна расправа", "inspection": "Јавни ув�
 # What a period or a day in an announcement is of, as the words before it say (when.CUES).
 WHAT = {"debate": "Јавна расправа", "inspection": "Јавни увид", "early_inspection": "Рани јавни увид", "session": "Јавна седница",
         "meeting": "Састанак или презентација", "remarks": "Примедбе", "": "У објави"}
+TOPIC = {"budget": "Буџет", "taxes": "Порези, таксе и цене", "plans": "Урбанистички и просторни планови",
+         "environment": "Животна средина", "development": "Стратегије и планови развоја", "other": "Остало"}
+WHY = {"нема адресе": "адресу сајта ове општине још немамо", "не одговара": "сајт општине није одговорио кад смо га читали",
+       "адреса нова, још није читана": "адреса сајта је нова и још није читана",
+       "још не умемо": "објаве са сајта ове општине још не умемо да прочитамо"}
+STATE = "rs"  # the place of what a body of the republic consults on
 RECENT_DAYS = 30
 # A title that names the one who asked for a plan or a study (an investor, an applicant) may name a private
 # person; the site then shows the kind of announcement and links the municipality's own page for its words
@@ -119,6 +127,7 @@ def frame(path: str, script: str, title: str, description: str, main: str, read:
 <link rel="icon" type="image/svg+xml" href="{root}znak.svg">
 <link rel="stylesheet" href="{root}osnova.css?v={version}">
 <link rel="stylesheet" href="{root}site.css?v={version}">
+<script src="{root}site.js?v={version}" defer></script>
 </head>
 <body>
 <a class="skip" href="#sadrzaj">Прескочи на садржај</a>
@@ -156,32 +165,59 @@ def frame(path: str, script: str, title: str, description: str, main: str, read:
 
 
 def period(p: dict) -> str:
-    """One period or day of an announcement, as words: "Јавни увид: од 30. 10. 2026. до 28. 11. 2026."."""
+    """One period or day of an announcement, as words: "од 30. 10. 2026. до 28. 11. 2026."."""
     if p["from"] and p["to"] == p["from"]:
-        words = day(p["from"]) + (f' у {p["hour"]}' if p["hour"] else "")
-    elif p["from"] and p["to"]:
-        words = f'од {day(p["from"])} до {day(p["to"])}'
-    elif p["to"]:
-        words = f'до {day(p["to"])}'
-    else:
-        words = f'од {day(p["from"])}' + (f', {p["days"]} дана' if p["days"] else "")
-    return f'{WHAT[p["what"]]}: {words}'
+        return day(p["from"]) + (f' у {p["hour"]}' if p["hour"] else "")
+    if p["from"] and p["to"]:
+        return f'од {day(p["from"])} до {day(p["to"])}'
+    if p["to"]:
+        return f'до {day(p["to"])}'
+    return f'од {day(p["from"])}' + (f', {p["days"]} дана' if p["days"] else "")
+
+
+def fold(text: str) -> str:
+    """Words as the search compares them: Latin, lower case, no marks on the letters (site.js folds what is typed)."""
+    low = latin(text).lower().replace("đ", "dj")
+    return "".join(c for c in unicodedata.normalize("NFD", low) if not unicodedata.combining(c))
+
+
+def card(place: str, where: str, by: str, kind: tuple[str, str], about: str, title: str, url: str, published: str,
+         periods: list[tuple[str, str]], days: list[str], over: bool = False, none: str = "") -> str:
+    """One row of a list, answering the reader's three questions in the same places every time: where (the
+    municipality, or the republic and its body), what about (the kind, the topic, the title in the source's
+    words, linked to the source) and when (each period or day with what it is of). Its data-* say the same to
+    the filters (site.js); the row is whole without them."""
+    chips = f'<span class="chip">{esc(kind[1])}</span>' + (f'<span class="chip">{TOPIC[about]}</span>' if about != "other" else "")
+    chips += '<span class="chip over">одржано</span>' if over else ""
+    lines = "".join(f"<li><b>{esc(what)}</b> {esc(words)}</li>" for what, words in periods)
+    when_ = f'<ul class="when">{lines}</ul>' if lines else f'<p class="when none">{none}</p>'
+    said = f'Објављено {day(published)}' if published else "Без дана објаве"
+    return (f'<li class="card" data-place="{esc(place)}" data-kind="{kind[0]}" data-topic="{about}" data-day="{published}" '
+            f'data-days="{" ".join(days)}"{" data-held" if over else ""} data-text="{esc(fold(text_of(where) + " " + by + " " + title))}">'
+            f'<div class="what"><p class="where">{where}{f"<span>{esc(by)}</span>" if by else ""}</p>'
+            f'<a class="title" href="{esc(url)}">{esc(title)}</a><p class="chips">{chips}</p></div>'
+            f'<div class="kada"><p class="next" hidden></p>{when_}<p class="pub">{said}</p></div></li>')
 
 
 def item(a: dict, names: dict, with_place: bool = True) -> str:
-    title = shown_title(a)
-    words = (f'<a class="title" href="{esc(a["url"])}">{esc(title)}</a>' if title else
-             f'<a class="title" href="{esc(a["url"])}">Наслов именује подносиоца; прочитајте га на сајту општине</a>')
-    place = f'<a class="where" href="{{home}}opstina/{esc(a["code"])}.html">{esc(names[a["code"]])}</a>' if with_place else ""
-    when = f'<span class="when">{day(a["day"])}</span>' if a["day"] else '<span class="when">без датума</span>'
-    over = " · одржано" if held(a["title"]) else ""
-    named = "".join(f'<span class="days">{period(p)}</span>' for p in a.get("when", []))
-    return f'<li>{when}{place}<span class="kind">{KIND[a["kind"]]}{over}</span>{words}{named}</li>'
+    """A municipality's announcement as a row."""
+    title = shown_title(a) or "Наслов именује подносиоца; прочитајте га на сајту општине"
+    name = names[a["code"]]
+    where = f'<a href="{{home}}opstina/{esc(a["code"])}.html">{esc(name)}</a>' if with_place else ""
+    periods = a.get("when", [])
+    days = sorted({d for p in periods if p["what"] for d in (p["from"], when.until(p)) if d})
+    none = "Објаву читамо само по наслову" if a["via"] == "wordpress search" else "У тексту објаве нисмо нашли дан"
+    return card(a["code"], where, "", (a["kind"], KIND[a["kind"]]), topic_of(a["title"]), title, a["url"], a["day"],
+                [(WHAT[p["what"]], period(p)) for p in periods], days, held(a["title"]), none)
 
 
 def topic(t: dict) -> str:
-    return (f'<li><span class="when">до {day(t["until"])}</span><span class="where">{esc(t["institution"])}</span>'
-            f'<span class="kind">{esc(t["phase"])}</span><a class="title" href="{esc(t["url"])}">{esc(t["title"])}</a></li>')
+    """A topic a body of the republic consults on, as a row: open until its phase under way ends."""
+    under_way = [p for p in t.get("phases", []) if p["active"]]
+    start = under_way[-1]["start"] if under_way else ""
+    words = f'од {day(start)} до {day(t["until"])}' if start else f'до {day(t["until"])}'
+    return card(STATE, "Република Србија", t["institution"], ("state", "Консултације државе"), topic_of(t["title"]), t["title"], t["url"],
+                t.get("phase_since") or t["created"], [(t["phase"], words)], [d for d in (start, t["until"]) if d])
 
 
 def state_of(domain: str, site: dict | None, found: int) -> str:
@@ -227,22 +263,41 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
     sites = {s["code"]: s for s in data["sites"]}
     pages: dict[str, tuple[str, str, str]] = {}
 
+    # The first page: one list. What is ahead first, the nearest day first (the municipalities' and the state's
+    # together), then the other announcements of the last 30 days, newest first.
+    rows_ahead = sorted([(ahead_of(a), azbuka(names[a["code"]]), item(a, names)) for a in ahead]
+                        + [(min(d for d in (t["until"],) if d), azbuka(t["institution"]), topic(t)) for t in open_now])
+    rest = called + over
+    rest.sort(key=lambda a: (a["day"], azbuka(names[a["code"]])), reverse=True)
+    cards = [r[2] for r in rows_ahead] + [item(a, names) for a in rest]
+    options, notes = [], []
+    for code, name in sorted(names.items(), key=lambda kv: azbuka(kv[1])):
+        found, domain, s = by_code.get(code, []), domains[code], sites.get(code)
+        options.append(f'<option value="{code}">{esc(name)}</option>')
+        own = f' Сајт општине: <a href="https://{esc(domain)}/">{esc(domain)}</a>.' if domain else ""
+        if found:
+            notes.append(f'<p id="m-{code}" hidden>{esc(name)}: читамо објаве са сајта општине, {len(found)} до сада. '
+                         f'<a href="{{home}}opstina/{code}.html">Све објаве ове општине</a>, и оне старије.</p>')
+        else:
+            notes.append(f'<p id="m-{code}" hidden>{esc(name)}: {WHY[state_of(domain, s, 0)]}. Зато њених објава овде засад нема; то није оцена општине.{own}</p>')
+    notes.append(f'<p id="m-{STATE}" hidden>Државни органи: теме отворене за коментаре на порталу еКонсултације. <a href="{{home}}drzava.html">Шта је још на порталу</a>.</p>')
     pages["index.html"] = ("Учествуј: где и када можеш да кажеш шта мислиш", ABOUT, f"""
 <h1>Где и када можеш да кажеш шта мислиш</h1>
-<p class="lead">Јавне расправе и јавни увиди које општине објављују на својим сајтовима, и консултације државних органа отворене за коментаре. Сваки ред води на објаву саме институције.</p>
-<h2>У општинама: предстоји</h2>
-<p class="count">{len(ahead)} објава из {len({a["code"] for a in ahead})} општина у којима нешто још траје или тек почиње, по најближем дану. Периоде и дане програм чита из текста објаве, са оним на шта се по речима објаве односе; место и остало пише у објави. Објаве читамо са сајтова {len(by_code)} општина од {len(names)}; <a href="{{home}}opstine.html">којих и зашто</a>.</p>
-<ol class="items">{"".join(item(a, names) for a in ahead)}</ol>
-<h2>У општинама: остали позиви и огласи, последњих {RECENT_DAYS} дана</h2>
-<p class="count">{len(called)} објава из {len({a["code"] for a in called})} општина, најновије прво: оно што наводе је прошло, или у тексту нисмо нашли дан (текст је у приложеном документу, дан је написан без године, или објаву читамо само по наслову).</p>
-<ol class="items">{"".join(item(a, names) for a in called)}</ol>
-<h2>У општинама: одржано</h2>
-<p class="count">{len(over)} објава чији наслов каже да је расправа или увид одржан: вест о томе или извештај.</p>
-<ol class="items">{"".join(item(a, names) for a in over)}</ol>
-<h2>Држава: отворено за коментаре</h2>
-<p class="count">{len(open_now)} тема на порталу еКонсултације, по року.</p>
-<ol class="items">{"".join(topic(t) for t in open_now)}</ol>
-<p><a href="{{home}}drzava.html">Шта је још на порталу</a></p>
+<p class="lead">Јавне расправе и јавни увиди које општине објављују на својим сајтовима, и консултације државних органа отворене за коментаре. Уз сваку: где је, о чему је и када. Наслов води на објаву саме институције.</p>
+<form id="filter" class="filter" hidden aria-label="Избор објава">
+<label>Место <select name="mesto"><option value="">Сва места</option><option value="{STATE}">Република Србија (државни органи)</option>{"".join(options)}</select></label>
+<label>Када <select name="kada"><option value="ahead">Траје или тек почиње</option><option value="week">Нешто почиње или истиче за 7 дана</option><option value="recent">Објављено у последњих {RECENT_DAYS} дана</option></select></label>
+<label>Врста <select name="vrsta"><option value="">Све врсте</option>{"".join(f'<option value="{k}">{v}</option>' for k, v in KIND.items())}<option value="state">Консултације државе</option></select></label>
+<label>Тема <select name="tema"><option value="">Све теме</option>{"".join(f'<option value="{k}">{v}</option>' for k, v in TOPIC.items())}</select></label>
+<label>Реч у наслову <input type="search" name="rec" placeholder="нпр. соларна, вртић, порез"></label>
+<button type="reset">Поништи избор</button>
+</form>
+<div id="reci" hidden><span data-k="found">Објава:</span><span data-k="next">Следећи дан:</span><span data-k="today">данас</span><span data-k="tomorrow">сутра</span><span data-k="in">за</span><span data-k="day">дан</span><span data-k="days">дана</span></div>
+<p id="broj" class="count" aria-live="polite">{len(rows_ahead)} објава у којима нешто траје или тек почиње, по најближем дану, па још {len(rest)} објава из последњих {RECENT_DAYS} дана, најновије прво.</p>
+<div id="mesta" class="note">{"".join(notes)}</div>
+<p id="nema" class="note" hidden>Нема објава за овај избор.</p>
+<ol id="lista" class="cards">{"".join(cards)}</ol>
+<p class="count">Периоде и дане програм чита из текста објаве, са оним на шта се по речима објаве односе; тему и врсту из наслова. Место одржавања пише у објави. Објаве читамо са сајтова {len(by_code)} општина од {len(names)}; <a href="{{home}}opstine.html">којих и зашто</a>. <a href="{{home}}o-projektu.html">Како читамо</a>.</p>
 """)
 
     rows = []
@@ -273,7 +328,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
             years.setdefault(a["day"][:4] or "", []).append(a)
         parts = []
         for year in sorted(years, reverse=True):
-            parts.append(f'<h2>{year or "Без датума"}</h2><ol class="items">{"".join(item(a, names, False) for a in years[year])}</ol>')
+            parts.append(f'<h2>{year or "Без датума"}</h2><ol class="cards">{"".join(item(a, names, False) for a in years[year])}</ol>')
         link = f'<a href="{esc(site["answers"])}://{esc(site["domain"])}/">{esc(site["domain"])}</a>' if site else ""
         pages[f"opstina/{code}.html"] = (f"{names[code]}: јавне расправе и јавни увиди — Учествуј",
                                          f"Јавне расправе и јавни увиди које {names[code]} објављује на свом сајту.", f"""
@@ -289,7 +344,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <p class="lead">Консултације и јавне расправе државних органа о прописима и планским документима, са портала <a href="https://ekonsultacije.gov.rs/">еКонсултације</a>.</p>
 <h2>Отворено за коментаре</h2>
 <p class="count">{len(open_now)} тема чија фаза траје, по року.</p>
-<ol class="items">{"".join(topic(t) for t in open_now)}</ol>
+<ol class="cards">{"".join(topic(t) for t in open_now)}</ol>
 <h2>Шта још има на порталу</h2>
 <p>Портал води {len(topics)} тема. Још {len(stale)} није означено као завршено, а ниједна њихова фаза не траје: рок је прошао или фаза није ни отворена. Сматрамо отвореном само тему чија фаза траје данас, по датумима самог портала.</p>
 <p>Општине су на порталу регистроване, али на њему готово ништа не објављују; њихове расправе су на њиховим сајтовима (<a href="{{home}}opstine.html">Општине</a>).</p>
@@ -315,7 +370,9 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <li><b>Наслов је речи општине,</b> пренет како је написан; на латиничком издању пресловљен. Јавни функционер у наслову остаје како га је општина навела. Наслов који именује подносиоца захтева (инвеститора, носиоца пројекта) не преносимо, јер може именовати приватно лице: уместо њега стоји веза ка објави.</li>
 <li><b>Одржано је оно за шта наслов то каже</b> („одржана“, „извештај о спроведеној јавној расправи“). Остале објаве су позиви и огласи, а понека и вест коју наслов не одаје.</li>
 <li><b>Када је шта, читамо из текста објаве, а текст не преносимо.</b> Програм налази периоде („од … до …“), рокове („до …“) и дане са часом, и уз сваки ставља оно о чему говоре речи испред њега: јавни увид, јавна расправа, јавна седница, примедбе. Где то из речи није јасно, пише само „У објави“. Дан написан без године не узима, а трајање („30 дана од …“) не прерачунава у крајњи дан. Оно што се завршило пре објаве не наводи. Нађете ли погрешан дан, пријавите га.</li>
+<li><b>Тему и врсту читамо из наслова,</b> по речима („буџет“, „план детаљне регулације“, „процена утицаја“). Наслов који не каже тему стоји под „Остало“.</li>
 <li><b>Отворено је оно чија фаза траје данас,</b> по датумима самог портала.</li>
+<li><b>Избор на првој страни ради у вашем прегледачу.</b> Једна скрипта, наша, сакрива редове које нисте тражили и рачуна колико је дана до следећег дана у објави. Ништа не чува на уређају и ништа никуд не шаље; без ње је списак цео.</li>
 <li><b>Списак општинских сајтова је један,</b> заједнички са Изборним подацима: адреса нађена или исправљена тамо стиже и овде.</li>
 </ul>
 <h2>Шта још није овде</h2>
@@ -335,7 +392,8 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
     for f in STATIC.iterdir():
         shutil.copy(f, out / f.name)
     (out / ".nojekyll").write_text("", encoding="utf-8")
-    version = hashlib.sha256((DESIGN / "osnova.css").read_bytes() + (STATIC / "site.css").read_bytes()).hexdigest()[:8]
+    version = hashlib.sha256((DESIGN / "osnova.css").read_bytes() + (STATIC / "site.css").read_bytes()
+                             + (STATIC / "site.js").read_bytes()).hexdigest()[:8]
     wrong = []
     for path, (title, description, main) in pages.items():
         for script in ("lat", "cyr"):
@@ -351,10 +409,11 @@ def check(page: str, script: str) -> list[str]:
     wrong = []
     if "@@" in page or "{home}" in page or "{root}" in page:
         wrong.append("a placeholder was left in")
-    if "<script" in page:
-        wrong.append("a script; the site has none")
+    # One script, the site's own file: nothing written into a page, nothing from another server.
+    if re.sub(r'<script src="(?:\.\./)*site\.js\?v=\w+" defer></script>', "", page, count=1).count("<script") or re.search(r"\son[a-z]+=", page):
+        wrong.append("a script other than the site's own file")
     loads = re.findall(r'<(?:img|iframe|source|video|audio|embed|object)\b[^>]*\b(?:src|data)="([^"]*)"', page)
-    loads += re.findall(r'<link\b[^>]*\bhref="([^"]*)"', page)
+    loads += re.findall(r'<link\b[^>]*\bhref="([^"]*)"', page) + re.findall(r'<script\b[^>]*\bsrc="([^"]*)"', page)
     wrong += [f"loads from another server: {a}" for a in loads if re.match(r"(?:[a-z]+:)?//", a)]
     if script == "lat":
         left = CYRILLIC.findall(text_of(page).replace("Ћирилица", ""))
