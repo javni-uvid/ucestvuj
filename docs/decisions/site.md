@@ -59,6 +59,48 @@ calendar"); a feed per municipality of new calls; the place of the debate read f
 a filter above the municipalities; a map. The first two are only worth it once the readings run by themselves,
 which they don't yet.
 
+## Design rules
+
+What the pages keep to (21 Nov 2026, the maintainer: "take the principles of design and architecture for this
+project as the other two projects that use osnova have them"). They are javni-uvid/zailiprotiv's rules, which
+came from looks at its site against WCAG 2.2, NN/g, GOV.UK, Stanford's credibility guidelines, the Trust Project
+and ProPublica's principles for news graphics, as javni-uvid/izborna-analiza took them on 20 Nov 2026, adapted
+to this site's reader: a person who wants to know what they can take part in where they live, most likely on a
+phone. Working rules, changed as readers show otherwise, unlike the principles in AGENTS.md. A change to a page
+is checked against them.
+
+1. **One scale of letter sizes.** A size is a step of the family's scale (`--ju-t-1` … `--ju-t-8`, `--ju-t-h1`
+   in `osnova.css`); body text is 16 px; grey (`--ju-muted`) is for what is secondary. `tests/test_design.py`
+   refuses a size outside the scale.
+2. **No colour here means anything.** Black ink on a white page, grey for what is secondary and for the cards,
+   all from the family's `--ju-*` values; `site.css` declares no colour of its own (a test checks). Nothing
+   needs one yet: a kind, a topic and "held" are words in a label. Should the site get a colour that carries
+   data, it means a kind of content, never a municipality's merit (principle 3), is never the only way a fact
+   is told, and its text keeps 4.5:1.
+3. **The most important first.** A page says what it is and gives its main fact in the first screen: on the
+   first page, what a reader can still take part in, the nearest day first. On a phone the place is chosen at
+   once and the other choices are folded, so that the list begins on the first screen.
+4. **A number never stands alone.** It says what it is counted of and has something to compare it with ("49 of
+   168 municipalities", "12 announcements from 7 municipalities"), and a way to how it is read. Unknown is not
+   zero: a municipality that is not read says so, and an announcement without a day says that none was found.
+5. **A trend is drawn, a table is kept.** There is no chart yet; when the point is how something changed, bars
+   from zero come first, in black and grey, and the table follows. No chart without its numbers.
+6. **The phone first.** Every change is looked at at 320 and 390 px in both scripts; no page is wider than its
+   screen; things to press are 44 px high; a long list shows its first rows and a way to the rest (the first
+   page holds what is ahead and the last 30 days, the rest is on each municipality's page).
+7. **Everything can be checked.** Each row leads to the institution's own announcement; each page says the day
+   its sources were read; the project's page says how each thing is read (a kind, a topic, a period) and that a
+   program reads it. Nothing is ranked by preference, and no municipality is marked (principles 1 and 3).
+8. **For every reader.** Keyboard and screen reader reach everything; every page works without its script
+   (`site.js` only filters and counts days); the keyboard's place is outlined in ink, the first Tab skips to the
+   page (`.skip`); nothing moves; the reader is not addressed as a man or a woman.
+9. **Measured, then changed.** The size of the pages (the build's 1 MB limit; the largest is 122 KB) and, once
+   there are any, visit counts are read before a change to how a page is laid out, and after it.
+
+Checked on 21 Nov 2026: the first page, a municipality's page and the municipalities' table at 320 and 390 px
+in both scripts (no page wider than its screen); rules 1, 2 and 8 by `tests/test_design.py`. Not done yet: a
+run of axe-core's WCAG 2.2 AA rules on every kind of page, as izborna-analiza does on a template's change.
+
 ## What a page says
 
 - **An announcement's title is the municipality's words,** shown as written and linked to its page there; the

@@ -17,6 +17,10 @@ people. The rules of work and the principles are here; each part's decisions are
   and **security** checks the workflows, the packages and the code. On Windows set `PYTHONUTF8=1`.
 - **The list of the municipalities' sites is izborna-analiza's** (`data/municipal_sites.csv` is a copy, brought by
   `ucestvuj list` and the **list** workflow): an address found or corrected is written there, never here.
+- **The design rules and the code's rules are the family's** (21 Nov 2026, the maintainer's decision): the
+  rules javni-uvid/zailiprotiv keeps, as javni-uvid/izborna-analiza took them, adapted here. A change to a page
+  is checked against "Design rules" in `docs/decisions/site.md` (the phone first: 320 and 390 px, both
+  scripts); a change to the code against `docs/decisions/code.md`. `tests/test_design.py` holds what a test can.
 - **Ask a source little,** name the project in the User-Agent (`web.AGENT`), read incrementally. The readings
   are run by hand for now (README.md, Commands); the tests (`uv run pytest -q`) ask no source.
 - **Talk to the maintainer in Serbian** (Latin script), briefly. Code, comments and docs are in English.
@@ -55,7 +59,8 @@ One more, this project's own:
 | Part | File |
 |---|---|
 | The sources, what is read from each and how | `docs/decisions/data.md` |
-| The site: its pages, what a page says, the preview | `docs/decisions/site.md` |
+| The site: its pages, the design rules, what a page says, the preview | `docs/decisions/site.md` |
+| The code's layout, the build's steps, the workflows, the tests | `docs/decisions/code.md` |
 
 ## Open decisions (the maintainer's)
 

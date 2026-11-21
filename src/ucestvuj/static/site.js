@@ -72,6 +72,10 @@
     var at = pair.indexOf("="), name = pair.slice(0, at);
     if (at > 0 && f[name]) { f[name].value = decodeURIComponent(pair.slice(at + 1)); if (f[name].tagName === "SELECT" && f[name].selectedIndex < 0) f[name].selectedIndex = 0; }
   });
+  // The other choices are folded on a phone, so the list starts on the first screen; open where there is room,
+  // and where the address already holds one of them.
+  var more = form.querySelector("details");
+  more.open = window.matchMedia("(min-width: 720px)").matches || ["kada", "vrsta", "tema", "rec"].some(function (name) { return f[name].value && f[name].value !== "ahead"; });
   form.hidden = false;
   form.addEventListener("input", apply);
   form.addEventListener("submit", function (e) { e.preventDefault(); });

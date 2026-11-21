@@ -54,8 +54,14 @@ h2 { font: 700 var(--ju-t-6)/1.2 var(--ju-serif); margin: 2.4rem 0 .6rem; }
 }
 
 /* The first page's choice: where, when, what kind, what about, and a word. Shown by the script that makes it work. */
-.filter { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .8rem 1rem; align-items: end;
-  background: var(--ju-card); border: 1px solid var(--ju-line); padding: 1rem; margin: 1.2rem 0 .8rem; }
+.filter { background: var(--ju-card); border: 1px solid var(--ju-line); padding: 1rem; margin: 1.2rem 0 .8rem; }
+.filter > label { max-width: 26rem; }
+.filter details { margin-top: .8rem; }
+.filter summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: .5rem; font-weight: 600; font-size: var(--ju-t-2); }
+.filter summary::before { content: "+"; font-weight: 700; }
+.filter details[open] summary::before { content: "−"; }
+.filter summary::-webkit-details-marker { display: none; }
+.filter details > div { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .8rem 1rem; align-items: end; }
 .filter[hidden] { display: none; }
 .filter label { min-width: 0; display: grid; gap: .25rem; font-size: var(--ju-t-1); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ju-muted); }
 .filter select, .filter input, .filter button { font: var(--ju-t-3)/1.2 var(--ju-sans); min-height: 44px; padding: .4rem .6rem; width: 100%;
