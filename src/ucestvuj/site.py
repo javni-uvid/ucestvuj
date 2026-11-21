@@ -15,6 +15,8 @@ import re
 import shutil
 from pathlib import Path
 
+from ucestvuj.announcements import held
+from ucestvuj.sites import REPORT
 from ucestvuj.translit import CYRILLIC, latin_page, text_of
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -155,7 +157,8 @@ def item(a: dict, names: dict, with_place: bool = True) -> str:
              f'<a class="title" href="{esc(a["url"])}">Наслов именује подносиоца; прочитајте га на сајту општине</a>')
     place = f'<a class="where" href="{{home}}opstina/{esc(a["code"])}.html">{esc(names[a["code"]])}</a>' if with_place else ""
     when = f'<span class="when">{day(a["day"])}</span>' if a["day"] else '<span class="when">без датума</span>'
-    return f'<li>{when}{place}<span class="kind">{KIND[a["kind"]]}</span>{words}</li>'
+    over = " · одржано" if held(a["title"]) else ""
+    return f'<li>{when}{place}<span class="kind">{KIND[a["kind"]]}{over}</span>{words}</li>'
 
 
 def topic(t: dict) -> str:
@@ -163,9 +166,12 @@ def topic(t: dict) -> str:
             f'<span class="kind">{esc(t["phase"])}</span><a class="title" href="{esc(t["url"])}">{esc(t["title"])}</a></li>')
 
 
-def state_of(site: dict | None, found: int) -> str:
-    if site is None:
+def state_of(domain: str, site: dict | None, found: int) -> str:
+    """What is read of a municipality. `domain` is the list's address, `site` what the last look at it found."""
+    if not domain:
         return "нема адресе"
+    if site is None or site["domain"] != domain:
+        return "адреса нова, још није читана"
     if not site["answers"]:
         return "не одговара"
     if found:
@@ -178,6 +184,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
     today = today or datetime.date.today()
     data = load()
     names = {r["municipality_code"]: r["name"] for r in data["listed"]}
+    domains = {r["municipality_code"]: r["domain"] for r in data["listed"]}
     by_code: dict[str, list] = {}
     seen_urls: set[tuple] = set()
     for a in sorted(data["announcements"], key=lambda a: (a["day"], a["url"]), reverse=True):
@@ -189,6 +196,8 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
     since = (today - datetime.timedelta(days=RECENT_DAYS)).isoformat()
     recent = sorted((a for rows in by_code.values() for a in rows if a["day"] >= since),
                     key=lambda a: (a["day"], azbuka(names[a["code"]])), reverse=True)
+    called = [a for a in recent if not held(a["title"])]
+    over = [a for a in recent if held(a["title"])]
     topics = data["consultations"]
     open_now = sorted((t for t in topics if t["open"] and t.get("until", "") >= today.isoformat()),
                       key=lambda t: (t["until"], t["institution"], t["title"]))
@@ -199,9 +208,12 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
     pages["index.html"] = ("Учествуј: где и када можеш да кажеш шта мислиш", ABOUT, f"""
 <h1>Где и када можеш да кажеш шта мислиш</h1>
 <p class="lead">Јавне расправе и јавни увиди које општине објављују на својим сајтовима, и консултације државних органа отворене за коментаре. Сваки ред води на објаву саме институције.</p>
-<h2>У општинама, последњих {RECENT_DAYS} дана</h2>
-<p class="count">{len(recent)} објава из {len({a["code"] for a in recent})} општина, најновије прво. Објаве засад читамо са сајтова {len(by_code)} општина од {len(names)}; <a href="{{home}}opstine.html">којих и зашто</a>.</p>
-<ol class="items">{"".join(item(a, names) for a in recent)}</ol>
+<h2>У општинама: позиви и огласи, последњих {RECENT_DAYS} дана</h2>
+<p class="count">{len(called)} објава из {len({a["code"] for a in called})} општина, најновије прво. Дан је дан објаве, не дан расправе: рок и место су у самој објави, а ми засад читамо само наслов. Објаве читамо са сајтова {len(by_code)} општина од {len(names)}; <a href="{{home}}opstine.html">којих и зашто</a>.</p>
+<ol class="items">{"".join(item(a, names) for a in called)}</ol>
+<h2>У општинама: одржано</h2>
+<p class="count">{len(over)} објава чији наслов каже да је расправа или увид одржан: вест о томе или извештај.</p>
+<ol class="items">{"".join(item(a, names) for a in over)}</ol>
 <h2>Држава: отворено за коментаре</h2>
 <p class="count">{len(open_now)} тема на порталу еКонсултације, по року.</p>
 <ol class="items">{"".join(topic(t) for t in open_now)}</ol>
@@ -213,13 +225,16 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
         site, found = sites.get(code), by_code.get(code, [])
         last = next((a["day"] for a in found if a["day"]), "")
         label = f'<a href="{{home}}opstina/{code}.html">{esc(name)}</a>' if found else esc(name)
-        link = f'<a href="{esc(site["answers"] or "https")}://{esc(site["domain"])}/">{esc(site["domain"])}</a>' if site else ""
+        domain = domains[code]
+        scheme = site["answers"] if site and site["domain"] == domain and site["answers"] else "https"
+        link = f'<a href="{scheme}://{esc(domain)}/">{esc(domain)}</a>' if domain else ""
         rows.append(f"<tr><th scope=\"row\">{label}</th><td class=\"num\">{len(found) or ''}</td><td>{day(last)}</td>"
-                    f"<td>{state_of(site, len(found))}</td><td>{link}</td></tr>")
+                    f"<td>{state_of(domain, site, len(found))}</td><td>{link}</td></tr>")
     pages["opstine.html"] = ("Општине: јавне расправе и јавни увиди — Учествуј", "Шта која општина објављује на свом сајту, по азбуци.", f"""
 <h1>Општине</h1>
 <p class="lead">Шта општине објављују на својим сајтовима о јавним расправама и јавним увидима, по азбуци.</p>
 <p>Општински сајтови немају заједнички облик. Читамо оне које можемо да питамо програмом (претрага сајта, фид). „Још не умемо“ значи да сајт одговара, али његове објаве засад не умемо да прочитамо; „не одговара“ да сајт није одговорио; „нема адресе“ да адресу сајта још немамо. То није оцена општине: многе објављују на страницама које још не умемо да прочитамо.</p>
+<p>Списак сајтова је заједнички са <a href="https://izbornipodaci.rs/">Изборним подацима</a>. Знате адресу које овде нема, или је нека погрешна? <a href="{REPORT}">Пријавите је</a>: исправка стиже на оба сајта.</p>
 <div class="scroll"><table class="sites">
 <thead><tr><th scope="col">Општина</th><th scope="col" class="num">Објаве</th><th scope="col">Последња</th><th scope="col">Стање</th><th scope="col">Сајт</th></tr></thead>
 <tbody>{"".join(rows)}</tbody>
@@ -240,7 +255,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <p class="crumbs"><a href="{{home}}opstine.html">Општине</a></p>
 <h1>{esc(names[code])}</h1>
 <p class="lead">{len(found)} објава о јавним расправама и јавним увидима са сајта {link}, најновије прво.</p>
-<p class="note">Наслови су речи општине. Објава може бити позив, али и вест да је расправа одржана: прочитајте је на сајту општине. Наслов који именује подносиоца захтева (инвеститора) не преносимо.</p>
+<p class="note">Наслови су речи општине. „Одржано“ стоји уз објаву чији наслов каже да је расправа или увид одржан; и објава без те ознаке може бити вест, а не позив: прочитајте је на сајту општине. Наслов који именује подносиоца захтева (инвеститора) не преносимо.</p>
 {"".join(parts)}
 """)
 
@@ -273,7 +288,9 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <li><b>Иста правила за сваку општину.</b> Општине су по азбуци; ниједна се не оцењује, ниједна се не рангира.</li>
 <li><b>Сваки ред води на објаву саме институције.</b> Сајт не преписује објаве, само њихов наслов, дан и адресу.</li>
 <li><b>Наслов је речи општине,</b> пренет како је написан; на латиничком издању пресловљен. Јавни функционер у наслову остаје како га је општина навела. Наслов који именује подносиоца захтева (инвеститора, носиоца пројекта) не преносимо, јер може именовати приватно лице: уместо њега стоји веза ка објави.</li>
+<li><b>Одржано је оно за шта наслов то каже</b> („одржана“, „извештај о спроведеној јавној расправи“). Остале објаве су позиви и огласи, а понека и вест коју наслов не одаје.</li>
 <li><b>Отворено је оно чија фаза траје данас,</b> по датумима самог портала.</li>
+<li><b>Списак општинских сајтова је један,</b> заједнички са Изборним подацима: адреса нађена или исправљена тамо стиже и овде.</li>
 </ul>
 <h2>Шта још није овде</h2>
 <ul>

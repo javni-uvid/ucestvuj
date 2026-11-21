@@ -16,6 +16,7 @@ import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 
 from ucestvuj import web
+from ucestvuj.translit import latin
 
 ASKED = ("јавна расправа", "javna rasprava", "јавни увид", "javni uvid")
 # What a title says the announcement is; the first that matches. Latin and Cyrillic, lower case.
@@ -24,6 +25,11 @@ KINDS = (
     ("inspection", re.compile(r"javn\w* uvid|јавн\w* увид")),
     ("debate", re.compile(r"javn\w* rasprav|јавн\w* расправ")),
 )
+# A title that says the debate or the inspection is over: news that it was held, or the report on it. Read in
+# Latin, with or without the marks on the letters. "Извештај о стратешкој процени" is a document on inspection,
+# not a report on one, so a report counts only when it is on a debate or an inspection.
+_HELD = re.compile(r"odr[zž]an|sproveden|zavr[sš]en|obavljen|zapisnik"
+                   r"|izve[sš]taj\w* (?:o|sa) (?:\w+ )?(?:ran\w+ )?javn\w+ (?:rasprav|uvid)")
 _BUDGET = re.compile(r"budžet|budzet|буџет")
 _TAGS = re.compile(r"<[^>]+>")
 
@@ -31,6 +37,12 @@ _TAGS = re.compile(r"<[^>]+>")
 def kind(title: str) -> str:
     low = title.lower()
     return next((name for name, pattern in KINDS if pattern.search(low)), "")
+
+
+def held(title: str) -> bool:
+    """Whether the title itself says the debate or the inspection was held. A title that doesn't say so may
+    still be news of one: only the municipality's own page tells."""
+    return bool(_HELD.search(latin(title).lower()))
 
 
 def clean(text: str) -> str:

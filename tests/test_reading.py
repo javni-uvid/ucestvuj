@@ -54,3 +54,22 @@ def test_an_announcement_is_kept_only_when_its_title_says_what_it_is():
     assert announcements.entry("Asfaltiranje ulice", "https://a.rs/3", "2026-01-01", "feed") is None
     assert announcements.day("Thu, 19 Nov 2026 10:00:00 +0000") == "2026-11-19"
     assert announcements.day("2026-11-19T10:00:00Z") == "2026-11-19" and announcements.day("juče") == ""
+
+
+def test_a_title_says_when_the_debate_was_held():
+    for title in ("Одржана јавна расправа о нацрту буџета", "ИЗВЕШТАЈ О СПРОВЕДЕНОЈ ЈАВНОЈ РАСПРАВИ О НАЦРТУ ОДЛУКЕ",
+                  "Odrzana javna rasprava", "Извештај са јавне расправе", "Извештај о обављеном раном јавном увиду"):
+        assert announcements.held(title), title
+    for title in ("ЈАВНИ ПОЗИВ ЗА УЧЕШЋЕ У ЈАВНОЈ РАСПРАВИ О НАЦРТУ ОДЛУКЕ О БУЏЕТУ", "Јавна расправа",
+                  "Обавештење о терминима одржавања јавне седнице комисије за јавни увид",
+                  "Оглас за јавни увид у Нацрт плана и Извештај о стратешкој процени утицаја плана на животну средину"):
+        assert not announcements.held(title), title
+
+
+def test_a_new_copy_of_the_list_says_what_it_changed():
+    row = lambda code, name, domain: {"municipality_code": code, "name": name, "domain": domain}
+    old = [row("1", "Ада", "ada.org.rs"), row("2", "Ариље", ""), row("3", "Бор", "bor.rs"), row("4", "Стара", "s.rs")]
+    new = [row("1", "Ада", "ada.org.rs"), row("2", "Ариље", "arilje.org.rs"), row("3", "Бор", ""), row("5", "Нова", "n.rs")]
+    assert sites.changes(old, new) == ["Ариље: no address -> arilje.org.rs", "Бор: bor.rs -> no address",
+                                       "Нова: added, n.rs", "Стара: left out"]
+    assert sites.table('municipality_code,name,domain,note\n1,Ада,ada.org.rs,"a, b"\n')[0]["note"] == "a, b"

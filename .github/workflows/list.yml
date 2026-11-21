@@ -1,0 +1,45 @@
+# Brings the list of the municipalities' own sites from javni-uvid/izborna-analiza (data/municipal_sites.csv), which
+# keeps it: its weekly watch (Tuesdays 04:41 UTC) and its maintainers write there every address found or
+# corrected. Weekly after that watch, and by hand right after a change there. It commits straight to main, as
+# the data workflows do. No source is asked: the file is the organization's own. A new address is read by the
+# next `ucestvuj sites` and `ucestvuj announcements`, run by hand; until then the site says the address is new.
+name: list
+
+on:
+  schedule:
+    - cron: "41 6 * * 2"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: list
+  cancel-in-progress: false
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write  # commits data/municipal_sites.csv
+      actions: write   # starts pages: a push by a workflow's own token starts no workflow
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Copy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pip install -q uv==0.13.9 && uv sync --frozen
+          uv run ucestvuj list | tee "$RUNNER_TEMP/changed"
+          git add data/municipal_sites.csv
+          if git diff --cached --quiet; then exit 0; fi
+          uv run pytest -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          { echo "The municipalities' sites as izborna-analiza lists them"; echo; grep -v changed$ "$RUNNER_TEMP/changed"; } > "$RUNNER_TEMP/message"
+          git commit -q -F "$RUNNER_TEMP/message"
+          git push -q
+          gh workflow run pages.yml

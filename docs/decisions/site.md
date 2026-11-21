@@ -32,9 +32,21 @@ the same commit as the change.
   municipality's page (`site.APPLICANT`). The rule goes by words and errs on the side of hiding: a company named
   as investor is hidden too. A private person named otherwise is not caught by it; a reader's report is
   answered by a correction of the rule.
+- **A debate that was held is shown as held** (21 Nov 2026, the maintainer: "if the debate was held, then that is
+  how it is"). An announcement whose title says the debate or the inspection is over (news that it was held, a
+  report on it; `announcements.held`) is kept, marked "одржано", and on the first page listed apart, under the
+  calls and notices. Of the 1,530 titles 65 say so; of the 32 of the last 30 days, 3. A title that doesn't say
+  so may still be news of a debate ("the mayor at the public debate on the budget"): the rule goes by words and
+  the pages say that. The first page says that the day is the announcement's, not the debate's: the deadline
+  and the place are in the announcement's text, which is not read yet.
 - **Open is what is under way today:** a state topic is listed as open when its phase under way, by the
   portal's own days (`consultations.phases`), ends today or later. Of the 181 topics the portal kept as not
   ended on 21 Nov 2026, 7 were.
 - **The municipalities' states are said, not judged:** "we read it", "not yet" (the site answers, its
   announcements can't be read yet), "doesn't answer", "no address". The page says that this is no mark of the
   municipality.
+- **The list of sites is shared with Izborni podaci, and the page says so** (21 Nov 2026, the maintainer: a
+  connection between the two for when someone finds a new local site). The municipalities' page links
+  izborna-analiza's issues for an address that is missing or wrong, since the list is kept there
+  (`docs/decisions/data.md`). A municipality whose address in the list is not the one last looked at says
+  "the address is new, not read yet", and links the list's address.

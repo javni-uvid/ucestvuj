@@ -118,10 +118,29 @@ Everything below is in `data/`, with where it came from and the day in `data/sou
   anything is published: a rule for what is a call, and a decision on titles that name a person (principle 4).
 - **Užice and Sevojno share one site** (`uzice.rs`), so the same announcements stand under both.
 
+## One list of the municipalities' sites, kept in izborna-analiza
+
+21 Nov 2026, the maintainer: the two projects are to be connected for when someone finds a new local site.
+
+- **The list is `javni-uvid/izborna-analiza`'s `data/municipal_sites.csv`,** and `data/municipal_sites.csv` here
+  is a copy of it, never changed here. Its weekly watch already writes back an address it finds, with the old
+  one in the note; a hand correction is made there too.
+- **`ucestvuj list` copies it and says what changed** (an address found, changed or lost); the **list** workflow
+  runs it on Tuesdays after that watch, commits the copy when it differs and starts **pages**. A list that lost
+  its columns or a tenth of its rows is not copied.
+- **A site found here goes there:** by a reader through the link on the municipalities' page (an issue in
+  izborna-analiza), by us as a pull request there. It comes back with the next copy, so both sites have it.
+- **A new address is not read by the workflow.** `ucestvuj sites` and `ucestvuj announcements` are still run by
+  hand; until then the site says the address is new.
+
 ## Where the rest of what a citizen can take part in is
 
 Not read yet; in the order of what each would add.
 
+0. **An announcement's own text** (21 Nov 2026): the day, the place and the deadline of a debate are in the
+   text, not the title, so the site can say that a call was published and not whether it is still open. The
+   WordPress sites give the text with the post; how a day is taken from free text, and who checks it, is the
+   maintainer's decision (AGENTS.md).
 1. **A topic's dates and documents on eKonsultacije** (its phases and methods): turns the list into "open until".
 2. **The list pages behind the first page's links** on the sites that have no search to ask (`sites.json`), the
    `ls.gov.rs` category first, as its 15 sites are built alike.
