@@ -79,7 +79,7 @@ other sites yet. The first guide is the request for information of public import
 initiative and the citizens' assembly (`docs/decisions/data.md`, "A proposed first step"). A municipality's
 statute is read by a model and checked by a person. The page of actions takes every organizer that publishes
 an action open to anyone by one rule and does not judge the call's aim; news and social networks come in as
-feeds listed in `data/action_feeds.csv` and as readers' reports checked by a person (`akcija.yml`).
+feeds listed in `data/action_feeds.csv` and as readers' reports checked by a person (`akcija.yml`). A statute read by a model is checked by the model's second reading from the statute's pages (the maintainer's decision of 22 Nov 2026, in `data/statutes.json`: `checked_by`).
 
 Decided on 21 Nov 2026 (`docs/decisions/site.md`, `docs/decisions/data.md`): a debate that was held is shown as
 held, apart from the calls; public officials in a title are kept, a title naming an applicant is not shown; the

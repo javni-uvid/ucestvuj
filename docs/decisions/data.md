@@ -79,8 +79,8 @@ read (Кнић, Лозница, Петровац на Млави, Пландиш
 Велика Плана, Земун; no OCR here) and one address gave a page, not a file (Смедеревска Паланка). Fields: the area a
 citizens' assembly is convened for, whether and how many citizens may convene it, how many must be present, and the
 signatures for a citizens' initiative. Each field holds the article and the statute's own sentence, and a test
-checks that the number is in the sentence. **Every row says `checked: false`:** a model read it, a person has not
-checked it yet; the page says so. The statutes differ (Лозница: citizens do not convene, 10% present; Стари Град:
+checks that the number is in the sentence. A row is `checked` when the model's second reading (below) agrees, with `checked_by` saying so: **decided
+22 Nov 2026 by the maintainer: the model's second reading is enough as the check** (before that: a person); the page says so. The statutes differ (Лозница: citizens do not convene, 10% present; Стари Град:
 10%; the others 30 or 50 citizens and 5%), which is why a guide cannot say it for all.
 **A second reading, the same day (22 Nov 2026, by the model, from the statutes' pages as images):** every one of the
 24 values of the five rows kept is as the page prints it (also the "или" in Ужице, and that Лозница names no citizens

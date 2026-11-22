@@ -214,6 +214,6 @@ same way as the first guide: our words marked, the law's word for word, the vers
   municipalities lexifina has, which are mostly Belgrade's own (the fields have to hold before all are read).
 - **Update (22 Nov 2026): a table of the six statutes read** (step 6: who may convene an assembly, how many must be
   present, signatures for an initiative), each row with the statute's link and, folded, the article and sentence of
-  every field. Marked "Проба, и није проверено": the maintainer's decision is that a person checks what a model
-  read; no row is `checked` yet.
+  every field. Marked "Проба": a model read it and read it a second time from the statute's pages; the maintainer decided
+  (22 Nov 2026) that this second reading is enough as the check.
 - **No letter-writer here:** the law gives no form for a proposal, and a statute may.
