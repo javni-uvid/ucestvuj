@@ -1,6 +1,7 @@
 """The site built from the data in the repository: no source is asked."""
 
 import datetime
+from pathlib import Path
 
 from ucestvuj import site
 from ucestvuj.translit import CYRILLIC, latin, latin_page, text_of
@@ -111,3 +112,14 @@ def test_an_action_says_where_what_and_when_and_never_a_contact():
     assert 'data-place="novi-sad"' in shown and 'data-kind="volunteer"' in shown and "Извор: Новосадски волонтерски сервис" in shown
     assert "<b>Волонтирање</b> 6. 12. 2026., од 8 до 14</li>" in shown and "<b>Рок за пријаву</b> до 29. 11. 2026.</li>" in shown
     assert site.place_key("Градска општина Вождовац") == site.place_key("Вождовац")
+
+
+def test_the_page_of_actions_says_what_kind_of_source_a_row_has_and_how_to_report_one():
+    row = {"kind": "environment", "source": "feed", "organizer": "Zasadi drvo", "place": "", "title": "Sadnja", "url": "https://a.rs/1",
+           "start": "2026-12-01", "end": "2026-12-01", "time": "", "venue": "", "deadline": "", "code": "", "how": "news"}
+    shown = site.action_card(row)
+    assert "Извор: Zasadi drvo (вести на њиховом сајту)" in shown and "Место је у објави" in shown and 'data-place=""' in shown
+    assert "пријава читаоца, проверена" in site.action_card({**row, "how": "report"})
+    assert "Извор: Zasadi drvo<" in site.action_card({**row, "how": ""})
+    form = (Path(site.ROOT) / ".github" / "ISSUE_TEMPLATE" / "akcija.yml").read_text(encoding="utf-8")
+    assert "template=akcija.yml" in site.ACTION_REPORT and "Ne upisujte lične podatke" in form and "required: true" in form

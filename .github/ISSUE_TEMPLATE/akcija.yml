@@ -1,0 +1,48 @@
+name: Prijava akcije / Пријава акције
+description: An action people can join (giving blood, volunteering, a clean-up, a planting) that the page of actions does not have.
+title: "Akcija: "
+labels: ["akcija"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Prijavite akciju koju organizator javno objavljuje, sa vezom na njegovu objavu. Proverimo je i dodamo uz izvor.
+        Ne upisujte lične podatke (imena, telefone, adrese e-pošte), ni svoje ni tuđe: ovo je javna stranica.
+        Report an action that its organizer publishes, with a link to the announcement. We check it and add it with its source.
+        Do not write personal data (names, phones, e-mail addresses), yours or anyone's: this page is public.
+  - type: input
+    id: link
+    attributes:
+      label: Veza na objavu organizatora / Link to the organizer's announcement
+      description: The organizer's own page, or the news that reports it (we will say which it is).
+    validations:
+      required: true
+  - type: input
+    id: organizer
+    attributes:
+      label: Ko organizuje / Who organizes it
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Vrsta / Kind
+      options:
+        - Davanje krvi / Giving blood
+        - Volontiranje / Volunteering
+        - Uređenje i zaštita okoline / Environment (clean-up, planting)
+    validations:
+      required: true
+  - type: input
+    id: place
+    attributes:
+      label: Mesto / Place (opština ili grad)
+    validations:
+      required: true
+  - type: input
+    id: day
+    attributes:
+      label: Dan (i sat) / Day (and hour)
+      description: With the year, as written in the announcement.
+    validations:
+      required: true

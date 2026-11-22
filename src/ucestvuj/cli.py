@@ -2,6 +2,7 @@
 saying where it came from and when."""
 
 import argparse
+import csv
 import datetime
 import json
 import sys
@@ -82,7 +83,10 @@ def actions(args) -> None:
     seen = json.loads((DATA / "sites.json").read_text(encoding="utf-8"))
     path = DATA / "actions.json"
     before = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
-    found = source.fetch(seen, before, municipalities=not args.quick)
+    with (DATA / "action_feeds.csv").open(encoding="utf-8", newline="") as f:
+        feeds = list(csv.DictReader(f))
+    manual = json.loads((DATA / "actions_manual.json").read_text(encoding="utf-8"))
+    found = source.fetch(seen, before, municipalities=not args.quick, feeds=feeds, manual=manual)
     save(DATA / "actions.json", found)
     by = {s: sum(a["source"] == s for a in found) for s in sorted({a["source"] for a in found})}
     note("actions", {"from": "the blood transfusion institutes, the volunteer service of Novi Sad and the municipalities' own posts",

@@ -212,3 +212,29 @@ def test_a_day_that_is_the_newspapers_or_was_changed_is_not_read():
     moved = ("Јавна седница Комисије за јавни увид биће одржана у среду 22. априла 2026. године у 11 часова, у згради Градске управе, "
              "уместо како је раније било објављено у среду 15. априла 2026. године у 11 часова.")
     assert short(moved, "2026-04-15") == [("session", "2026-04-22", "2026-04-22", 0, "11:00")]
+
+
+def test_a_feed_entry_that_calls_to_join_and_names_a_day_ahead_is_kept():
+    feed = """<rss><channel>
+      <item><title>Pridružite se akciji čišćenja Save</title><link>https://a.rs/1</link><pubDate>Fri, 20 Nov 2026 10:00:00 +0000</pubDate>
+        <description>Akcija je u subotu 28.11.2026. u 10 časova kod mosta.</description></item>
+      <item><title>Održana akcija čišćenja Save</title><link>https://a.rs/2</link><pubDate>Fri, 20 Nov 2026 10:00:00 +0000</pubDate>
+        <description>Sledeća je 28.11.2026.</description></item>
+      <item><title>Pridružite se akciji čišćenja Dunava</title><link>https://a.rs/3</link><pubDate>Fri, 20 Nov 2026 10:00:00 +0000</pubDate>
+        <description>Bilo je 3.11.2026. lepo.</description></item>
+      <item><title>Nova godina u gradu</title><link>https://a.rs/4</link><pubDate>Fri, 20 Nov 2026 10:00:00 +0000</pubDate>
+        <description>28.11.2026.</description></item></channel></rss>"""
+    old = actions.web.get
+    actions.web.get = lambda *a, **k: feed.encode()
+    try:
+        [kept] = actions.of_feed({"organizer": "Udruženje", "url": "https://a.rs/feed/", "place": "Beograd"})
+    finally:
+        actions.web.get = old
+    assert (kept["kind"], kept["start"], kept["how"], kept["organizer"], kept["url"]) == ("environment", "2026-11-28", "news", "Udruženje", "https://a.rs/1")
+
+
+def test_a_readers_report_is_taken_only_whole():
+    whole = {"kind": "blood", "organizer": "Crveni krst Čačak", "place": "Čačak", "title": "Davanje krvi", "url": "https://a.rs/k", "start": "2026-12-01"}
+    rows = [whole, {**whole, "kind": "party"}, {**whole, "url": "a.rs/k"}, {**whole, "start": ""}, {**whole, "organizer": ""}]
+    [taken] = actions.reported(rows)
+    assert (taken["how"], taken["source"], taken["end"]) == ("report", "report", "2026-12-01")

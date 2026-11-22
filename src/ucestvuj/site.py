@@ -41,6 +41,7 @@ WHY = {"нема адресе": "адресу сајта ове општине �
        "адреса нова, још није читана": "адреса сајта је нова и још није читана",
        "још не умемо": "објаве са сајта ове општине још не умемо да прочитамо"}
 STATE = "rs"  # the place of what a body of the republic consults on
+ACTION_REPORT = REPO + "/issues/new?template=akcija.yml"
 ACTION = {"blood": "Давање крви", "volunteer": "Волонтирање", "environment": "Уређење и заштита околине"}
 RECENT_DAYS = 30
 # A title that names the one who asked for a plan or a study (an investor, an applicant) may name a private
@@ -226,9 +227,11 @@ def action_card(a: dict) -> str:
     words = day(a["start"]) if same else f'од {day(a["start"])} до {day(a["end"])}'
     words += f", {a['time']}" if a["time"] else ""
     periods = [(ACTION[a["kind"]], words)] + ([("Рок за пријаву", "до " + day(a["deadline"]))] if a["deadline"] else [])
-    return card(place_key(a["place"]), esc(_PREFIX.sub("", a["place"])), a["venue"], (a["kind"], ACTION[a["kind"]]), "other",
+    how = {"news": " (вести на њиховом сајту)", "report": " (пријава читаоца, проверена)"}.get(a.get("how", ""), "")
+    where = esc(_PREFIX.sub("", a["place"])) if a["place"] else "Место је у објави"
+    return card(place_key(a["place"]), where, a["venue"], (a["kind"], ACTION[a["kind"]]), "other",
                 a["title"], a["url"], a["start"], periods, [d for d in (a["start"], a["end"]) if d],
-                source="Извор: " + a["organizer"])
+                source="Извор: " + a["organizer"] + how)
 
 
 def topic(t: dict) -> str:
@@ -324,7 +327,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 
     # The page of actions: what is still to come, the nearest day first.
     todo = sorted((a for a in data["actions"] if a["end"] >= today.isoformat()), key=lambda a: (a["start"], a["kind"], a["place"], a["title"]))
-    places = sorted({(place_key(a["place"]), _PREFIX.sub("", a["place"])) for a in todo}, key=lambda p: azbuka(p[1]))
+    places = sorted({(place_key(a["place"]), _PREFIX.sub("", a["place"])) for a in todo if a["place"]}, key=lambda p: azbuka(p[1]))
     by_kind = {k: sum(1 for a in todo if a["kind"] == k) for k in ACTION}
     pages["akcije.html"] = ("Акције: давање крви, волонтирање, уређење околине — Учествуј", "Акције у којима можеш да учествујеш: давање крви, волонтерске акције, чишћење и сађење.", f"""
 <h1>Акције у којима можеш да учествујеш</h1>
@@ -343,7 +346,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <div id="mesta" class="note"></div>
 <p id="nema" class="note" hidden>Нема акција за овај избор.</p>
 <ol id="lista" class="cards">{"".join(action_card(a) for a in todo)}</ol>
-<p class="count">Сваку акцију објављује организатор на свом сајту, и то је њен извор: завод за трансфузију, Новосадски волонтерски сервис или општина. Дан и сате програм чита са те странице. Нису све акције отворене за свакога: нека организује фирма или установа за своје запослене, па место и услове проверите код организатора. Акција за уређење околине има мало, јер их организатори ретко објављују унапред. <a href="{{home}}o-projektu.html">Како читамо</a>.</p>
+<p class="count">Сваку акцију објављује организатор на свом сајту, и то је њен извор: завод за трансфузију, Новосадски волонтерски сервис или општина. Дан и сате програм чита са те странице. Нису све акције отворене за свакога: нека организује фирма или установа за своје запослене, па место и услове проверите код организатора. Акција за уређење околине има мало, јер их организатори ретко објављују унапред. Знате акцију коју овде нема? <a href="{ACTION_REPORT}">Пријавите је</a> са везом на објаву организатора: проверимо је и додамо уз извор. <a href="{{home}}o-projektu.html">Како читамо</a>.</p>
 """)
 
     rows = []
