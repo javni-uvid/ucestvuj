@@ -164,3 +164,26 @@ the environment, giving blood, positive initiatives there".
   izborna-analiza's issues for an address that is missing or wrong, since the list is kept there
   (`docs/decisions/data.md`). A municipality whose address in the list is not the one last looked at says
   "the address is new, not read yet", and links the list's address.
+
+## The guide to the request for information (22 Nov 2026, the first guide)
+
+`zahtev.html`, "Водич" in the bar; written by `guide.py` from `data/laws.json` (the Law on Free Access to
+Information of Public Importance as the register prints it, `docs/decisions/data.md`, "The text of the laws").
+
+- **Six steps** (from whom; who may and whether a reason is needed; what the request holds, with the letter;
+  the deadline; the cost; refusal or silence and the complaint to the Commissioner). Each is a plain-words line
+  marked "Својим речима" and then the law's paragraphs word for word, with the article, the paragraph ("став N")
+  where the article's paragraphs are the law's own numbered ones (15, 16, 17, 24; not 22, whose points sit in one
+  paragraph), a link to the register, and above all the law's gazette numbers and the day the version took effect
+  (principles 6 and 7).
+- **A quote the law no longer has stops the build** (`guide.Missing`): the page never shows a paragraph that
+  is not in the law as read.
+- **Not legal advice, said at the top** (principle 8); how organs keep the deadlines in practice is said to be unknown.
+- **The letter** stands in the page as a text with blanks in square brackets, so it is whole without the script. With
+  it a form fills the blanks (`site.js`, the second part); what is typed stays in the page, goes nowhere and is not
+  stored; a button copies the letter. The blanks are the fields' own placeholders, so the same letter is made in
+  both scripts (a test holds this). The organ's name is typed by the reader: the list of municipalities does not say
+  whether a name is a city or a municipality, and the organ's own name ("општинска управа") is not ours to guess.
+- **Not done:** a list of organs with addresses from the Commissioner's catalogue (12,363 bodies; a choice
+  by name is the next step), a letter for the complaint to the Commissioner, a print/PDF form, a view of the page
+  on a phone in a real browser (the headless browser would not start on 22 Nov).

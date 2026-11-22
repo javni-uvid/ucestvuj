@@ -82,3 +82,36 @@
   form.addEventListener("reset", function () { setTimeout(apply, 0); });
   apply();
 })();
+
+/* The letter of the guide to the request for information: the form fills the blanks of a letter that stands in the
+   page without it. What is typed is put into the letter in this page and goes nowhere: no request, no storage. The
+   blanks are the fields' own placeholders (square brackets), so the letter reads the same in either script. */
+(function () {
+  "use strict";
+  var form = document.getElementById("pismo-forma");
+  var letter = document.getElementById("pismo");
+  if (!form || !letter) return;
+  var template = letter.value;
+  var fields = Array.prototype.slice.call(form.querySelectorAll("input, textarea, select"));
+  function fill() {
+    var text = template;
+    fields.forEach(function (field) {
+      var token = field.getAttribute("data-token") || field.getAttribute("placeholder");
+      var value = field.tagName === "SELECT" ? field.options[field.selectedIndex].text : field.value.trim();
+      if (token && value) text = text.split(token).join(value);
+    });
+    letter.value = text;
+  }
+  var copy = document.getElementById("pismo-kopija");
+  var state = document.getElementById("pismo-stanje");
+  if (copy && navigator.clipboard) {
+    copy.hidden = false;
+    copy.addEventListener("click", function () {
+      navigator.clipboard.writeText(letter.value).then(function () { state.textContent = copy.getAttribute("data-done") || "Копирано."; });
+    });
+  }
+  form.hidden = false;
+  form.addEventListener("input", fill);
+  form.addEventListener("submit", function (e) { e.preventDefault(); });
+  fill();
+})();

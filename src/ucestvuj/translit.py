@@ -10,7 +10,7 @@ _PAIRS.update({"љ": "lj", "њ": "nj", "џ": "dž"})
 _PAIRS.update({"і": "i", "ї": "i", "є": "e", "ґ": "g", "й": "j", "ы": "y", "э": "e", "ё": "e", "ў": "u",
                "ю": "ju", "я": "ja", "щ": "šč", "ъ": "", "ь": ""})
 _TAG = re.compile(r"(<[^>]+>)")
-_SAID = re.compile(r'\b(content|aria-label|title|alt|placeholder)="([^"]*)"')
+_SAID = re.compile(r'\b(content|aria-label|title|alt|placeholder|data-token|data-done)="([^"]*)"')
 CYRILLIC = re.compile("[Ѐ-ӿ]")
 
 
