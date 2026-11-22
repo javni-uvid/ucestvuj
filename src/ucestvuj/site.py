@@ -77,7 +77,7 @@ def shown_title(a: dict) -> str | None:
 
 def load() -> dict:
     read = lambda name: json.loads((DATA / name).read_text(encoding="utf-8"))
-    with (DATA / "municipal_sites.csv").open(encoding="utf-8", newline="") as f:
+    with (ROOT / "osnova" / "data" / "municipalities.csv").open(encoding="utf-8", newline="") as f:
         listed = list(csv.DictReader(f))
     return {"announcements": read("announcements.json"), "actions": read("actions.json"), "sites": read("sites.json"),
             "consultations": read("consultations.json"), "laws": read("laws.json"), "statutes": read("statutes.json"), "sources": read("sources.json"), "listed": listed}
@@ -364,7 +364,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <h1>Општине</h1>
 <p class="lead">Шта општине објављују на својим сајтовима о јавним расправама и јавним увидима, по азбуци.</p>
 <p>Општински сајтови немају заједнички облик. Читамо оне које можемо да питамо програмом (претрага сајта, фид). „Још не умемо“ значи да сајт одговара, али његове објаве засад не умемо да прочитамо; „не одговара“ да сајт није одговорио; „нема адресе“ да адресу сајта још немамо. То није оцена општине: многе објављују на страницама које још не умемо да прочитамо.</p>
-<p>Списак сајтова је заједнички са <a href="https://izbornipodaci.rs/">Изборним подацима</a>. Знате адресу које овде нема, или је нека погрешна? <a href="{REPORT}">Пријавите је</a>: исправка стиже на оба сајта.</p>
+<p>Списак сајтова је заједнички свим сајтовима <a href="https://javni-uvid.github.io/osnova/">Јавног увида</a>, међу њима и <a href="https://izbornipodaci.rs/">Изборним подацима</a>. Знате адресу које овде нема, или је нека погрешна? <a href="{REPORT}">Пријавите је</a>: исправка стиже на све сајтове.</p>
 <div class="scroll"><table class="sites">
 <thead><tr><th scope="col">Општина</th><th scope="col" class="num">Објаве</th><th scope="col">Последња</th><th scope="col">Стање</th><th scope="col">Сајт</th></tr></thead>
 <tbody>{"".join(rows)}</tbody>

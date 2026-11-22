@@ -178,6 +178,12 @@ Everything below is in `data/`, with where it came from and the day in `data/sou
   its columns or a tenth of its rows is not copied.
 - **A site found here goes there:** by a reader through the link on the municipalities' page (an issue in
   izborna-analiza), by us as a pull request there. It comes back with the next copy, so both sites have it.
+- **22 Nov 2026, the list is the family's, kept in javni-uvid/osnova** (the maintainer's decision; nabavke needs
+  it too). It is read from the copy of osnova, `osnova/data/municipalities.csv`; `data/municipal_sites.csv`,
+  `ucestvuj list` and the **list** workflow are gone. The search for a site that doesn't answer moved from
+  izborna-analiza's watch to osnova's weekly **sites** workflow. A reader's report goes to an issue in osnova.
+  The copy is committed by a workflow's token, which starts no other workflow, so a changed address shows on
+  the site with the next build of **pages**.
 - **A new address is not read by the workflow.** `ucestvuj sites` and `ucestvuj announcements` are still run by
   hand; until then the site says the address is new.
 

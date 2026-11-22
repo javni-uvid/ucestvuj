@@ -20,7 +20,6 @@ source gave and what is not read.
 uv sync
 uv run ucestvuj opendata        # the bodies, the municipalities and local government's tasks, from data.gov.rs
 uv run ucestvuj consultations   # every topic on eKonsultacije
-uv run ucestvuj list            # the municipalities' sites: izborna-analiza's list, copied (says what changed)
 uv run ucestvuj sites           # what each municipality's own site is and links to (one request per site)
 uv run ucestvuj actions         # actions to join: blood drives, volunteer shifts, clean-ups (after `sites`)
 uv run ucestvuj announcements   # public debates and inspections the municipalities announce, and when each is on (after `sites`)
@@ -35,7 +34,6 @@ uv run pytest -q              # no test asks a source
 | test | on push and pull requests | the test suite |
 | security | on code or workflow changes, Mondays, by hand | actionlint and zizmor (the workflows), pip-audit (the packages), CodeQL (the code) |
 | pages | on a push that changes the site or its data, every morning, and by hand | build the site and publish it to GitHub Pages |
-| list | Tuesdays, and by hand | the list of the municipalities' sites copied from `javni-uvid/izborna-analiza`, which keeps it |
 | actions | daily, Mondays in whole, and by hand | the actions to join (blood drives, volunteer shifts) read from the institutes' and the service's pages and the municipalities' posts; starts pages |
 | osnova | daily, and by hand | the organization's shared rules, look and tools copied into `osnova/` |
 
@@ -46,8 +44,8 @@ page); an organizer's or a news site's feed is added to `data/action_feeds.csv`;
 `data/actions_manual.json`.
 
 **A municipality's site that is missing or wrong** is reported to
-[izborna-analiza](https://github.com/javni-uvid/izborna-analiza/issues): the list is one for both projects, and
-a correction there reaches this site with the next copy.
+[osnova](https://github.com/javni-uvid/osnova/issues): the list (`osnova/data/municipalities.csv`) is one for
+every javni-uvid project, and a correction there reaches this site with the next copy of osnova.
 
 ## What it will hold
 
