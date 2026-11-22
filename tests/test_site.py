@@ -170,7 +170,7 @@ def test_the_guide_to_the_initiative_quotes_the_law_and_says_the_statutes_are_no
     page = html.unescape((out / "cir" / "inicijativa.html").read_text(encoding="utf-8"))
     article = next(a for a in law["articles"] if a["number"] == "69")
     assert all(p in page for p in article["paragraphs"])  # the whole of article 69, word for word
-    assert "Статуте општина читамо тек за неколико општина" in page and "није проверено" in page
+    assert "Статуте општина читамо тек за неколико општина" in page and "довољна провера" in page
     assert "inicijativa.html" in (out / "cir" / "vodici.html").read_text(encoding="utf-8")
     assert (out / "inicijativa.html").exists() and (out / "vodici.html").exists()
 
