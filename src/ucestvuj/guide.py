@@ -56,29 +56,70 @@ def own(text: str) -> str:
     return f'<p class="own"><b>Својим речима:</b> {text}</p>'
 
 
-def letter_form() -> str:
-    """The letter-writer: a form that the script shows and a letter that is there without it, with its blanks."""
-    esc = html.escape
-    options = "".join(f"<option>{esc(v)}</option>" for v in FORMS)
-    return f"""<div class="writer">
-<form id="pismo-forma" class="filter" hidden aria-label="Писац захтева">
-<label>Орган власти (назив како га он пише, нпр. општинска управа) <input name="organ" placeholder="{SLOT['organ']}" autocomplete="off"></label>
-<label>Шта тражите <select name="form" data-token="{SLOT['form']}">{options}</select></label>
-<label>Која информација (што прецизније) <textarea name="what" rows="4" placeholder="{SLOT['what']}"></textarea></label>
-<label>Ваше име и презиме <input name="name" placeholder="{SLOT['name']}" autocomplete="off"></label>
-<label>Ваша адреса <input name="address" placeholder="{SLOT['address']}" autocomplete="off"></label>
-<label>Место и датум <input name="place" placeholder="{SLOT['place']}" autocomplete="off"></label>
+# The complaint to the Commissioner (article 22 of the law; what a complaint holds is article 159 of the Law on General
+# Administrative Procedure: the decision, the organ, its number and day, the signature). Two grounds, as article 22 gives
+# them for the common cases: the request was refused or dismissed, or not answered in time.
+CSLOT = {"ground": "[основ жалбе]", "decision": "[број и датум решења]", "request": "[датум захтева]"}
+# The organ's name is typed by the reader and cannot be declined by us: it stands in the nominative, after a colon or in brackets.
+GROUNDS = [f"против решења органа власти ({SLOT['organ']}; {CSLOT['decision']}) којим је одбијен или одбачен мој захтев за приступ информацијама од јавног значаја",
+           f"због тога што орган власти ({SLOT['organ']}) није у прописаном року одговорио на мој захтев за приступ информацијама од јавног значаја (захтев је поднет {CSLOT['request']})"]
+COMPLAINT = (f"{COMMISSIONER['name']}\n{COMMISSIONER['address']}\n\n"
+             "ЖАЛБА\n\n"
+             f"На основу члана 22. Закона о слободном приступу информацијама од јавног значаја изјављујем жалбу {CSLOT['ground']}.\n\n"
+             "Предлажем да Повереник наложи органу власти да ми омогући приступ траженој информацији, односно да поступи по мом захтеву.\n\n"
+             f"{SLOT['name']}\n{SLOT['address']}\n{SLOT['place']}\n")
+
+
+def writer(key: str, label: str, fields: str, letter: str) -> str:
+    """A letter-writer: a form that the script shows and a letter that is there without it, with its blanks."""
+    return f"""<div class="writer" data-letter="{key}">
+<form class="filter" hidden aria-label="{label}">
+{fields}
 <p class="note">Оно што упишете остаје у вашем прегледачу: ништа се не шаље и не чува. Копирајте писмо и пошаљите га сами.</p>
 </form>
-<label class="letter">Писмо <textarea id="pismo" rows="16" readonly>{esc(LETTER)}</textarea></label>
-<p><button type="button" id="pismo-kopija" data-done="Копирано." hidden>Копирај писмо</button> <span id="pismo-stanje" role="status"></span></p>
+<label class="letter">Писмо <textarea rows="16" readonly>{html.escape(letter)}</textarea></label>
+<p><button type="button" data-done="Копирано." hidden>Копирај писмо</button> <span role="status"></span></p>
 </div>"""
 
 
-def page(law: dict) -> tuple[str, str, str]:
+def field(label: str, name: str, slot: str, tag: str = "input") -> str:
+    if tag == "textarea":
+        return f'<label>{label} <textarea name="{name}" rows="4" placeholder="{slot}"></textarea></label>'
+    return f'<label>{label} <input name="{name}" placeholder="{slot}" autocomplete="off"></label>'
+
+
+def choice(label: str, name: str, slot: str, options: list[str]) -> str:
+    return f'<label>{label} <select name="{name}" data-token="{slot}">' + "".join(f"<option>{html.escape(o)}</option>" for o in options) + "</select></label>"
+
+
+def letter_form() -> str:
+    return writer("pismo", "Писац захтева", "\n".join([
+        field("Орган власти (назив како га он пише, нпр. општинска управа)", "organ", SLOT["organ"]),
+        choice("Шта тражите", "form", SLOT["form"], FORMS),
+        field("Која информација (што прецизније)", "what", SLOT["what"], "textarea"),
+        field("Ваше име и презиме", "name", SLOT["name"]),
+        field("Ваша адреса", "address", SLOT["address"]),
+        field("Место и датум", "place", SLOT["place"])]), LETTER)
+
+
+def complaint_form() -> str:
+    return writer("zalba", "Писац жалбе", "\n".join([
+        choice("Због чега се жалите", "ground", CSLOT["ground"], GROUNDS),
+        field("Орган власти (назив како га он пише)", "organ", SLOT["organ"]),
+        field("Број и датум решења (ако је орган одлучио)", "decision", CSLOT["decision"]),
+        field("Датум вашег захтева (ако орган није одговорио)", "request", CSLOT["request"]),
+        field("Ваше име и презиме", "name", SLOT["name"]),
+        field("Ваша адреса", "address", SLOT["address"]),
+        field("Место и датум", "place", SLOT["place"])]), COMPLAINT)
+
+
+def page(law: dict, procedure: dict) -> tuple[str, str, str]:
     q = lambda *a, **k: quote(law, *a, **k)
+    qp = lambda *a, **k: quote(procedure, *a, **k)
     version = law["in_force_from"].split("-")
     day = f"{int(version[2])}. {int(version[1])}. {version[0]}."
+    pv = procedure["in_force_from"].split("-")
+    proc_day = f"{int(pv[2])}. {int(pv[1])}. {pv[0]}."
     main = f"""
 <h1>Захтев за информације од јавног значаја</h1>
 <p class="lead">Свако може да затражи од органа власти информацију којом он располаже, а орган мора да одговори у року који закон одређује. Овде су кораци, и уз сваки члан закона на коме почива.</p>
@@ -115,6 +156,11 @@ def page(law: dict) -> tuple[str, str, str]:
 {q("16", 11, numbered=True)}
 {q("22", 0, 1, 2, 3)}
 {q("24", 0, 1, numbered=True)}
+<p>Шта жалба садржи и када може да се поднесе одређује Закон о општем управном поступку, на који упућује члан 23. Закона о слободном приступу ({html.escape(procedure['gazette'])}, пречишћен текст на снази од {proc_day}):</p>
+{qp("159", 0)}
+{qp("153", 0, 1)}
+{own("довољно је навести решење које побијате и у ком сте погледу незадовољни; ако орган уопште није одговорио, жалба се може поднети и после рока, најкасније годину дана од његовог истека. Писмо испод прави такву жалбу.")}
+{complaint_form()}
 <p>Жалба се шаље Поверенику: {html.escape(COMMISSIONER['name'])}, {html.escape(COMMISSIONER['address'])} (<a href="{COMMISSIONER['url']}">сајт</a>).</p>
 """
     return ("Захтев за информације од јавног значаја — Учествуј",

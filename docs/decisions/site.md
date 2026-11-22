@@ -184,6 +184,14 @@ Information of Public Importance as the register prints it, `docs/decisions/data
   stored; a button copies the letter. The blanks are the fields' own placeholders, so the same letter is made in
   both scripts (a test holds this). The organ's name is typed by the reader: the list of municipalities does not say
   whether a name is a city or a municipality, and the organ's own name ("општинска управа") is not ours to guess.
-- **Not done:** a list of organs with addresses from the Commissioner's catalogue (12,363 bodies; a choice
-  by name is the next step), a letter for the complaint to the Commissioner, a print/PDF form, a view of the page
-  on a phone in a real browser (the headless browser would not start on 22 Nov).
+- **The complaint** (step 6) has its own letter, with two grounds (the request was refused or dismissed; it was not
+  answered in time). What a complaint holds and the deadline rest on the Law on General Administrative Procedure
+  (articles 159 and 153), which article 23 of the law points to, so that law is read too (`laws.LAWS["procedure"]`).
+  The organ's name is typed by the reader and cannot be declined by us, so each sentence keeps it in the nominative,
+  in brackets.
+- **Not done:** a choice of the organ by name with its address from the Commissioner's catalogue. The catalogue's
+  names are Latin only (a Cyrillic page would offer Latin names, and turning them into Cyrillic by a program is
+  not safe: "nj", "lj", "dž"), and its 12,363 bodies are too many for a page; about 1,080 of them (the republic's
+  and the provincial and local organs, the municipal administrations and assemblies) would fit. The decision of
+  how is the maintainer's. Also not done: a print or PDF form; the page seen on a phone in a real browser (the
+  headless browser would not start on 22 Nov; the letters' logic was run in Node with a stand-in document).

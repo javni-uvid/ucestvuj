@@ -139,14 +139,24 @@ def test_the_guide_quotes_the_law_word_for_word_and_the_letter_has_the_same_blan
     first = next(a for a in law["articles"] if a["number"] == "15")["paragraphs"][3]
     assert first in html.unescape(cyr)
     assert law["url"] in cyr and "Службени гласник РС" in cyr
-    # the blanks of the letter are the fields' placeholders, in Cyrillic and, turned letter by letter, in Latin
+    # the blanks of the letters are the fields' placeholders, in Cyrillic and, turned letter by letter, in Latin
     for script, page in (("cyr", cyr), ("lat", lat)):
-        letter = re.search(r'<textarea id="pismo"[^>]*>(.*?)</textarea>', page, re.S).group(1)
+        letters = re.findall(r'<textarea rows="16" readonly>(.*?)</textarea>', page, re.S)
+        assert len(letters) == 2
+        request, complaint = (html.unescape(x) for x in letters)
+        shown = lambda slot: slot if script == "cyr" else latin(slot)
         for slot in guide.SLOT.values():
-            token = html.escape(slot) if script == "cyr" else html.escape(latin(slot))
-            assert token in letter or html.unescape(token) in html.unescape(letter), (script, slot)
-        assert html.unescape(letter).count("[") == 6
+            assert shown(slot) in request, (script, slot)
+        assert request.count("[") == 6
+        for slot in (guide.CSLOT["ground"], guide.SLOT["name"], guide.SLOT["address"], guide.SLOT["place"]):
+            assert shown(slot) in complaint, (script, slot)
+        # every blank inside a sentence the reader may choose is some field's placeholder, so that it can be filled
+        placeholders = {html.unescape(x) for x in re.findall(r'placeholder="([^"]*)"', page)}
+        for option in guide.GROUNDS + guide.FORMS:
+            for blank in re.findall(r"\[[^\]]+\]", shown(option)):
+                assert blank in placeholders, (script, blank)
     assert re.search(r'placeholder="\[naziv organa vlasti\]"', lat) and 'data-token="[šta tražite]"' in lat
+    assert "Члан 159." in cyr and "Član 159." in lat
     # the Commissioner's address on the page is the catalogue's
     catalogue = (site.DATA / "bodies.csv").read_text(encoding="utf-8")
     assert all(part in catalogue for part in guide.COMMISSIONER_IN_CATALOGUE)

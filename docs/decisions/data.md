@@ -51,7 +51,10 @@ answering, the reading fails and the last text stays (`data/laws.json`).
   licence: the laws are not protected works, its arrangement is CC0): the Law on Free Access to Information of
   Public Importance, 52 articles, version in force from 16 Feb 2022 (with the 105/2021 amendments). Of the 50
   articles that both have, all 50 are the same word for word (compared without spaces and punctuation); articles
-  13 and 48 are deleted in the register. lexifina is therefore a means to check, as principle 2 says, and not a source.
+  13 and 48 are deleted in the register.
+  The Law on General Administrative Procedure (18/2016, 95/2018, 2/2023; the version in force from 13 Jan 2023),
+  217 articles, is read the same way, because the complaint rests on it: all 217 are the same as lexifina's but one
+  (art. 178, where the register keeps the note "(3) Престао је да важи" that lexifina leaves out). lexifina is therefore a means to check, as principle 2 says, and not a source.
 - **Also found:** the articles 28а and 28б exist (added by 105/2021) and are written without a full stop.
 
 ## A municipality's statute
