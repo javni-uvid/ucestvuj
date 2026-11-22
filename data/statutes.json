@@ -28,6 +28,11 @@
    "article": "88",
    "quote": "Број потписа грађана потребан за покретање грађанске иницијативе износи 5% од укупног броја грађана са бирачким правом.",
    "percent": 5
+  },
+  "second_reading": {
+   "by": "model",
+   "day": "2026-11-22",
+   "method": "the statute's pages shown as images and read against each field's sentence; also the whole text searched for another way to convene an assembly (Лозница)"
   }
  },
  {
@@ -59,6 +64,11 @@
    "article": "128",
    "quote": "Грађанска иницијатива пуноважно је покренута ако је листа потписника грађанске иницијативе састављена у складу са законом и ако је исту потписало 5% бирача Града, који су уписани у бирачки списак, ако законом није другачије предвиђено.",
    "percent": 5
+  },
+  "second_reading": {
+   "by": "model",
+   "day": "2026-11-22",
+   "method": "the statute's pages shown as images and read against each field's sentence; also the whole text searched for another way to convene an assembly (Лозница)"
   }
  },
  {
@@ -94,6 +104,11 @@
    "article": "96",
    "quote": "Број потписа грађана потребан за покретање грађанске иницијативе износи 5% од укупног броја грађана са бирачким правом.",
    "percent": 5
+  },
+  "second_reading": {
+   "by": "model",
+   "day": "2026-11-22",
+   "method": "the statute's pages shown as images and read against each field's sentence; also the whole text searched for another way to convene an assembly (Лозница)"
   }
  },
  {
@@ -125,7 +140,13 @@
    "article": "82",
    "quote": "Грађанска иницијатива пуноважно је покренута ако је листа потписника грађанске иницијативе састављена у складу са законом и ако је исту потписало 5% од укупног броја грађана са бирачким правом.",
    "percent": 5
-  }
+  },
+  "second_reading": {
+   "by": "model",
+   "day": "2026-11-22",
+   "method": "the statute's pages shown as images and read against each field's sentence; also the whole text searched for another way to convene an assembly (Лозница)"
+  },
+  "caveat": "Општина је 2021. спровела јавну расправу о допуни статута; шта је допуњено, не знамо."
  },
  {
   "code": "70912",
@@ -156,7 +177,8 @@
    "article": "96",
    "quote": "Грађанска иницијатива пуноважно је покренута ако је листа потписника грађанске иницијативе састављена у складу са законом и ако је исту потписало 5% од укупног броја грађана са бирачким правом.",
    "percent": 5
-  }
+  },
+  "superseded_suspected": "На сајту општине је 8. 5. 2024. објављен нацрт новог статута, јавна расправа је завршена 22. 8. 2024, а 30. 8. 2024. је на дневном реду 5. седнице Скупштине био предлог статута. Усвојени текст нисмо нашли, па ред не приказујемо."
  },
  {
   "code": "80349",
@@ -187,6 +209,11 @@
    "article": "90",
    "quote": "Грађанска иницијатива пуноважно је покренута ако је листа потписника грађанске иницијативе састављена у складу са законом и ако је исту потписало 5% од укупног броја грађана са бирачким правом.",
    "percent": 5
+  },
+  "second_reading": {
+   "by": "model",
+   "day": "2026-11-22",
+   "method": "the statute's pages shown as images and read against each field's sentence; also the whole text searched for another way to convene an assembly (Лозница)"
   }
  }
 ]
