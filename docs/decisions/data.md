@@ -82,6 +82,14 @@ signatures for a citizens' initiative. Each field holds the article and the stat
 checks that the number is in the sentence. **Every row says `checked: false`:** a model read it, a person has not
 checked it yet; the page says so. The statutes differ (Лозница: citizens do not convene, 10% present; Стари Град:
 10%; the others 30 or 50 citizens and 5%), which is why a guide cannot say it for all.
+**A second reading, the same day (22 Nov 2026, by the model, from the statutes' pages as images):** every one of the
+24 values of the five rows kept is as the page prints it (also the "или" in Ужице, and that Лозница names no citizens
+among the conveners: its whole text was searched for another way to convene). It is recorded as `second_reading`
+and is not a person's check. It found one thing the text reading could not: **Петровац на Млави** put a new statute
+to public debate in May 2024 (report of 22 Aug) and its assembly had the proposal on the agenda of 30 Aug 2024, so
+the 2023 text is probably replaced; the adopted text was not found (the gazette issues of Sep-Oct 2024 do not hold it),
+so the row is kept in the data with `superseded_suspected` and left out of the table, and the page says why. Кнић
+held a public debate on a supplement of its statute in 2021 (`caveat`).
 **Currency is the risk:** the file a site offers may not be the statute in force (the gazette's latest consolidated
 text is; Пландиште's is of Dec 2018, Кнић's and Лозница's of 2019), so the page says it is the statute as the site
 had it and from which day.

@@ -187,3 +187,12 @@ def test_every_value_read_from_a_statute_is_in_the_sentence_quoted_for_it():
         n = r["convened_by_citizens"].get("number")
         assert n is None or str(n) in r["convened_by_citizens"]["quote"], r["name"]
         assert r["statute"]["url"].startswith("https://")
+
+
+def test_a_statute_suspected_to_be_replaced_is_not_in_the_table_and_the_page_says_why(tmp_path):
+    out = tmp_path / "s"
+    site.build(out, datetime.date(2026, 11, 22))
+    page = html.unescape((out / "cir" / "inicijativa.html").read_text(encoding="utf-8"))
+    assert "Петровац на Млави није у табели" in page
+    assert '<th scope="row">Петровац на Млави</th>' not in page
+    assert '<th scope="row">Кнић</th>' in page and "допуни статута" in page
