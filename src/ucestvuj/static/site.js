@@ -43,7 +43,7 @@
 
   var f = form.elements;
   function apply() {
-    var place = f.mesto.value, time = f.kada.value, kind = f.vrsta.value, topic = f.tema.value, asked = fold(f.rec.value.trim());
+    var place = f.mesto.value, time = f.kada.value, kind = f.vrsta.value, topic = f.tema ? f.tema.value : "", asked = fold(f.rec.value.trim());
     var shown = cards.filter(function (card) {
       var ok = (!place || card.getAttribute("data-place") === place) &&
         (!kind || card.getAttribute("data-kind") === kind) &&
@@ -63,7 +63,7 @@
     Array.prototype.forEach.call(document.querySelectorAll("#mesta > p"), function (note) { note.hidden = note.id !== "m-" + place; });
     var state = [];
     ["mesto", "kada", "vrsta", "tema", "rec"].forEach(function (name) {
-      if (f[name].value && !(name === "kada" && f[name].value === "ahead")) state.push(name + "=" + encodeURIComponent(f[name].value));
+      if (f[name] && f[name].value && !(name === "kada" && f[name].value === "ahead")) state.push(name + "=" + encodeURIComponent(f[name].value));
     });
     history.replaceState(null, "", state.length ? "#" + state.join("&") : location.pathname + location.search);
   }
@@ -75,7 +75,7 @@
   // The other choices are folded on a phone, so the list starts on the first screen; open where there is room,
   // and where the address already holds one of them.
   var more = form.querySelector("details");
-  more.open = window.matchMedia("(min-width: 720px)").matches || ["kada", "vrsta", "tema", "rec"].some(function (name) { return f[name].value && f[name].value !== "ahead"; });
+  more.open = window.matchMedia("(min-width: 720px)").matches || ["kada", "vrsta", "tema", "rec"].some(function (name) { return f[name] && f[name].value && f[name].value !== "ahead"; });
   form.hidden = false;
   form.addEventListener("input", apply);
   form.addEventListener("submit", function (e) { e.preventDefault(); });

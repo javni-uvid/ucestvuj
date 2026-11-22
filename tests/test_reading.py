@@ -2,7 +2,7 @@
 
 import pytest
 
-from ucestvuj import announcements, consultations, opendata, sites, when
+from ucestvuj import actions, announcements, consultations, opendata, sites, when
 
 
 def test_the_columns_that_name_people_never_reach_the_data():
@@ -153,3 +153,29 @@ def test_a_title_says_what_the_announcement_is_about():
                          ("Јавна расправа о Локалном акционом плану за младе", "development"),
                          ("Јавна расправа", "other")):
         assert announcements.topic(title) == about, title
+
+
+def test_a_blood_drive_is_read_from_the_calendar_links_of_the_institute_of_vojvodina():
+    page = ('<a href="https://calendar.google.com/calendar/render?action=TEMPLATE&#038;text=Dobrovoljno%20davanje%20krvi%20%E2%80%94%20Ruma'
+            '&#038;dates=20261120T080000/20261120T120000&#038;ctz=Europe/Belgrade&#038;location=Ruma%2C%20Kulturni%20centar">+</a>')
+    [drive] = actions.transfusion_vojvodina(page)
+    assert (drive["kind"], drive["place"], drive["venue"], drive["start"], drive["time"]) == ("blood", "Ruma", "Kulturni centar", "2026-11-20", "8:00–12:00")
+
+
+def test_the_institute_of_serbia_lists_a_card_a_day_and_a_closed_action_is_left_out():
+    page = ('<!-- KARTICA DANA --><h4><strong>Недеља, </strong> 22. новембар 2026.</h4><div class="card__title">'
+            '<img src="images/icondrop.svg" width="24px" alt="x"/>&nbsp;<strong> Шабац, </strong> Рибари <b> 9.30-13ч </b><br/>'
+            '<img src="images/upozorenje.svg" width="24px" alt="x"/>&nbsp;<strong> Нови Београд, </strong> Comtrade <b> 09-13ч </b><br/>'
+            '</div><!-- KRAJ KARTICE DANA -->')
+    [drive] = actions.transfusion_serbia(page)
+    assert (drive["place"], drive["venue"], drive["start"], drive["time"]) == ("Шабац", "Рибари", "2026-11-22", "9:30–13:00")
+
+
+def test_a_volunteer_position_keeps_its_days_and_never_the_hosts_contact():
+    post = {"link": "https://nvs.rs/volontiraj/x/", "title": {"rendered": "OBRT fest &#8211; razmena"},
+            "meta": {"_nvs_event_starts": "2026 11 29", "_nvs_event_ends": "2026 11 29", "_nvs_location": "OC OPENS",
+                     "_nvs_application_deadline": "2026 11 27", "_nvs_duration_info": "Од 14.00 до 20.00 часова - једна смена", "_nvs_contact_phone": "0692019016", "_nvs_contact_email": "x@gmail.com"}}
+    [position] = actions.volunteer_service([post, {"link": "https://nvs.rs/volontiraj/y/", "title": {"rendered": "bez dana"}, "meta": {}}])
+    assert (position["start"], position["deadline"], position["venue"], position["title"], position["time"]) == ("2026-11-29", "2026-11-27", "OC OPENS", "OBRT fest – razmena", "14:00–20:00")
+    assert actions._hours("Догађај ће трајати од 11 до 16 часова. Уколико број волонтера") == "11:00–16:00" and actions._hours("jedna smena") == ""
+    assert "0692019016" not in str(position) and "gmail" not in str(position)

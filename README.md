@@ -22,6 +22,7 @@ uv run ucestvuj opendata        # the bodies, the municipalities and local gover
 uv run ucestvuj consultations   # every topic on eKonsultacije
 uv run ucestvuj list            # the municipalities' sites: izborna-analiza's list, copied (says what changed)
 uv run ucestvuj sites           # what each municipality's own site is and links to (one request per site)
+uv run ucestvuj actions         # actions to join: blood drives, volunteer shifts, clean-ups (after `sites`)
 uv run ucestvuj announcements   # public debates and inspections the municipalities announce, and when each is on (after `sites`)
 uv run ucestvuj site --out _site   # the site from data/ (fails on a page that loads anything from elsewhere)
 uv run pytest -q              # no test asks a source
@@ -61,7 +62,7 @@ The family's (`osnova/principles.md`), whole in `AGENTS.md`.
 ```
 osnova/            the organization's shared rules, look and tools (a copy; changed in javni-uvid/osnova)
 docs/decisions/    the decisions by part: data.md (the sources), site.md (the pages, the design rules), code.md
-src/ucestvuj/        the readers: opendata, consultations, sites, announcements (when: its periods and days); web; cli
+src/ucestvuj/        the readers: opendata, consultations, sites, announcements (when: its periods and days), actions; web; cli
                    site.py, translit.py, static/ (the look, and site.js: the first page's filters): the site from data/
 data/              what was read, and sources.json: where each file came from and when
 tests/

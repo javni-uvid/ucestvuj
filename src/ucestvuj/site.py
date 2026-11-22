@@ -41,6 +41,7 @@ WHY = {"нема адресе": "адресу сајта ове општине �
        "адреса нова, још није читана": "адреса сајта је нова и још није читана",
        "још не умемо": "објаве са сајта ове општине још не умемо да прочитамо"}
 STATE = "rs"  # the place of what a body of the republic consults on
+ACTION = {"blood": "Давање крви", "volunteer": "Волонтирање", "environment": "Уређење и заштита околине"}
 RECENT_DAYS = 30
 # A title that names the one who asked for a plan or a study (an investor, an applicant) may name a private
 # person; the site then shows the kind of announcement and links the municipality's own page for its words
@@ -77,7 +78,7 @@ def load() -> dict:
     read = lambda name: json.loads((DATA / name).read_text(encoding="utf-8"))
     with (DATA / "municipal_sites.csv").open(encoding="utf-8", newline="") as f:
         listed = list(csv.DictReader(f))
-    return {"announcements": read("announcements.json"), "sites": read("sites.json"),
+    return {"announcements": read("announcements.json"), "actions": read("actions.json"), "sites": read("sites.json"),
             "consultations": read("consultations.json"), "sources": read("sources.json"), "listed": listed}
 
 
@@ -135,6 +136,8 @@ def frame(path: str, script: str, title: str, description: str, main: str, read:
 <header class="top">
   <a class="brand" href="{home}index.html">{NAME}</a>
   <nav aria-label="Сајт">
+    <a href="{home}index.html">Расправе</a>
+    <a href="{home}akcije.html">Акције</a>
     <a href="{home}opstine.html">Општине</a>
     <a href="{home}drzava.html">Држава</a>
     <a href="{home}o-projektu.html">О пројекту</a>
@@ -182,7 +185,7 @@ def fold(text: str) -> str:
 
 
 def card(place: str, where: str, by: str, kind: tuple[str, str], about: str, title: str, url: str, published: str,
-         periods: list[tuple[str, str]], days: list[str], over: bool = False, none: str = "") -> str:
+         periods: list[tuple[str, str]], days: list[str], over: bool = False, none: str = "", source: str = "") -> str:
     """One row of a list, answering the reader's three questions in the same places every time: where (the
     municipality, or the republic and its body), what about (the kind, the topic, the title in the source's
     words, linked to the source) and when (each period or day with what it is of). Its data-* say the same to
@@ -191,7 +194,7 @@ def card(place: str, where: str, by: str, kind: tuple[str, str], about: str, tit
     chips += '<span class="chip over">одржано</span>' if over else ""
     lines = "".join(f"<li><b>{esc(what)}</b> {esc(words)}</li>" for what, words in periods)
     when_ = f'<ul class="when">{lines}</ul>' if lines else f'<p class="when none">{none}</p>'
-    said = f'Објављено {day(published)}' if published else "Без дана објаве"
+    said = source or (f'Објављено {day(published)}' if published else "Без дана објаве")
     return (f'<li class="card" data-place="{esc(place)}" data-kind="{kind[0]}" data-topic="{about}" data-day="{published}" '
             f'data-days="{" ".join(days)}"{" data-held" if over else ""} data-text="{esc(fold(text_of(where) + " " + by + " " + title))}">'
             f'<div class="what"><p class="where">{where}{f"<span>{esc(by)}</span>" if by else ""}</p>'
@@ -209,6 +212,23 @@ def item(a: dict, names: dict, with_place: bool = True) -> str:
     none = "Објаву читамо само по наслову" if a["via"] == "wordpress search" else "У тексту објаве нисмо нашли дан"
     return card(a["code"], where, "", (a["kind"], KIND[a["kind"]]), topic_of(a["title"]), title, a["url"], a["day"],
                 [(WHAT[p["what"]], period(p)) for p in periods], days, held(a["title"]), none)
+
+
+def place_key(place: str) -> str:
+    """A place as the filter compares it: without "Град" or "Градска општина", folded."""
+    return fold(_PREFIX.sub("", place)).replace(" ", "-")
+
+
+def action_card(a: dict) -> str:
+    """An action to join as a row: the place and the venue, the title as the organizer wrote it (linked to it), the
+    day and the hours, and who announces it said as the source."""
+    same = a["start"] == a["end"]
+    words = day(a["start"]) if same else f'од {day(a["start"])} до {day(a["end"])}'
+    words += f", {a['time']}" if a["time"] else ""
+    periods = [(ACTION[a["kind"]], words)] + ([("Рок за пријаву", "до " + day(a["deadline"]))] if a["deadline"] else [])
+    return card(place_key(a["place"]), esc(_PREFIX.sub("", a["place"])), a["venue"], (a["kind"], ACTION[a["kind"]]), "other",
+                a["title"], a["url"], a["start"], periods, [d for d in (a["start"], a["end"]) if d],
+                source="Извор: " + a["organizer"])
 
 
 def topic(t: dict) -> str:
@@ -299,7 +319,31 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <div id="mesta" class="note">{"".join(notes)}</div>
 <p id="nema" class="note" hidden>Нема објава за овај избор.</p>
 <ol id="lista" class="cards">{"".join(cards)}</ol>
-<p class="count">Периоде и дане програм чита из текста објаве, са оним на шта се по речима објаве односе; тему и врсту из наслова. Место одржавања пише у објави. Објаве читамо са сајтова {len(by_code)} општина од {len(names)}; <a href="{{home}}opstine.html">којих и зашто</a>. <a href="{{home}}o-projektu.html">Како читамо</a>.</p>
+<p class="count">Тражите акцију, не расправу (давање крви, волонтирање, чишћење, сађење)? <a href="{{home}}akcije.html">Акције</a>. Периоде и дане програм чита из текста објаве, са оним на шта се по речима објаве односе; тему и врсту из наслова. Место одржавања пише у објави. Објаве читамо са сајтова {len(by_code)} општина од {len(names)}; <a href="{{home}}opstine.html">којих и зашто</a>. <a href="{{home}}o-projektu.html">Како читамо</a>.</p>
+""")
+
+    # The page of actions: what is still to come, the nearest day first.
+    todo = sorted((a for a in data["actions"] if a["end"] >= today.isoformat()), key=lambda a: (a["start"], a["kind"], a["place"], a["title"]))
+    places = sorted({(place_key(a["place"]), _PREFIX.sub("", a["place"])) for a in todo}, key=lambda p: azbuka(p[1]))
+    by_kind = {k: sum(1 for a in todo if a["kind"] == k) for k in ACTION}
+    pages["akcije.html"] = ("Акције: давање крви, волонтирање, уређење околине — Учествуј", "Акције у којима можеш да учествујеш: давање крви, волонтерске акције, чишћење и сађење.", f"""
+<h1>Акције у којима можеш да учествујеш</h1>
+<p class="lead">Давање крви, волонтерске смене, чишћење и сађење: оно што организатор сам објављује, са местом и даном. Уз сваку је означено ко је објављује; наслов води на његову објаву.</p>
+<form id="filter" class="filter" hidden aria-label="Избор акција">
+<label>Место <select name="mesto"><option value="">Сва места</option>{"".join(f'<option value="{k}">{esc(n)}</option>' for k, n in places)}</select></label>
+<details><summary>Време, врста, реч</summary><div>
+<label>Када <select name="kada"><option value="ahead">Од данас надаље</option><option value="week">Почиње или истиче за 7 дана</option></select></label>
+<label>Врста <select name="vrsta"><option value="">Све врсте</option>{"".join(f'<option value="{k}">{v}</option>' for k, v in ACTION.items())}</select></label>
+<label>Реч <input type="search" name="rec" placeholder="нпр. крв, парк, маратон"></label>
+<button type="reset">Поништи избор</button>
+</div></details>
+</form>
+<div id="reci" hidden><span data-k="found">Акција:</span><span data-k="next">Следећи дан:</span><span data-k="today">данас</span><span data-k="tomorrow">сутра</span><span data-k="in">за</span><span data-k="day">дан</span><span data-k="days">дана</span></div>
+<p id="broj" class="count" aria-live="polite">{len(todo)} акција од данас надаље: {by_kind["blood"]} давања крви, {by_kind["volunteer"]} волонтерских, {by_kind["environment"]} за уређење и заштиту околине.</p>
+<div id="mesta" class="note"></div>
+<p id="nema" class="note" hidden>Нема акција за овај избор.</p>
+<ol id="lista" class="cards">{"".join(action_card(a) for a in todo)}</ol>
+<p class="count">Сваку акцију објављује организатор на свом сајту, и то је њен извор: завод за трансфузију, Новосадски волонтерски сервис или општина. Дан и сате програм чита са те странице. Нису све акције отворене за свакога: нека организује фирма или установа за своје запослене, па место и услове проверите код организатора. Акција за уређење околине има мало, јер их организатори ретко објављују унапред. <a href="{{home}}o-projektu.html">Како читамо</a>.</p>
 """)
 
     rows = []
@@ -355,7 +399,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
     sources = data["sources"]
     srows = []
     for key, label in (("announcements", "Сајтови општина"), ("consultations", "еКонсултације"), ("bodies", "Каталог органа јавне власти, Повереник"),
-                       ("municipalities", "Контакт подаци општина, министарство"), ("tasks", "Послови локалне самоуправе, министарство")):
+                       ("municipalities", "Контакт подаци општина, министарство"), ("tasks", "Послови локалне самоуправе, министарство"), ("actions", "Акције: заводи за трансфузију, волонтерски сервис, општине")):
         s = sources.get(key)
         if s:
             where = f'<a href="{esc(s.get("page") or s.get("url") or "")}">{esc(s.get("title") or label)}</a>' if (s.get("page") or s.get("url")) else esc(label)
@@ -373,6 +417,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <li><b>Одржано је оно за шта наслов то каже</b> („одржана“, „извештај о спроведеној јавној расправи“). Остале објаве су позиви и огласи, а понека и вест коју наслов не одаје.</li>
 <li><b>Када је шта, читамо из текста објаве, а текст не преносимо.</b> Програм налази периоде („од … до …“), рокове („до …“) и дане са часом, и уз сваки ставља оно о чему говоре речи испред њега: јавни увид, јавна расправа, јавна седница, примедбе. Где то из речи није јасно, пише само „У објави“. Дан написан без године не узима, а трајање („30 дана од …“) не прерачунава у крајњи дан. Оно што се завршило пре објаве не наводи. Нађете ли погрешан дан, пријавите га.</li>
 <li><b>Тему и врсту читамо из наслова,</b> по речима („буџет“, „план детаљне регулације“, „процена утицаја“). Наслов који не каже тему стоји под „Остало“.</li>
+<li><b>Акције објављује организатор, и то је њихов извор.</b> На страници „Акције“ уз сваку пише ко је објављује и наслов води на његову објаву. То нису само институције: може и удружење или група грађана, ако сама објављује акцију којој може да се придружи сваки човек, а ту могућност је одлучио одржавалац 22. 11. 2026. (вести и друштвене мреже такође могу бити извор, ако се тако означе; програм их данас не чита). Иста правила за сваког организатора. Лични подаци (телефон, мејл) се не преносе. Акцију затвореног типа (за запослене једне фирме) не преносимо кад сам организатор то каже; кад не каже, место и услове проверите код њега.</li>
 <li><b>Отворено је оно чија фаза траје данас,</b> по датумима самог портала.</li>
 <li><b>Избор на првој страни ради у вашем прегледачу.</b> Једна скрипта, наша, сакрива редове које нисте тражили и рачуна колико је дана до следећег дана у објави. Ништа не чува на уређају и ништа никуд не шаље; без ње је списак цео.</li>
 <li><b>Списак општинских сајтова је један,</b> заједнички са Изборним подацима: адреса нађена или исправљена тамо стиже и овде.</li>

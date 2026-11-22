@@ -77,6 +77,17 @@ def announcements(_args) -> None:
     print(f'announcements: {len(found)} from {len({f["code"] for f in found})} municipalities')
 
 
+def actions(_args) -> None:
+    from ucestvuj import actions as source
+    seen = json.loads((DATA / "sites.json").read_text(encoding="utf-8"))
+    found = source.fetch(seen)
+    save(DATA / "actions.json", found)
+    by = {s: sum(a["source"] == s for a in found) for s in sorted({a["source"] for a in found})}
+    note("actions", {"from": "the blood transfusion institutes, the volunteer service of Novi Sad and the municipalities' own posts",
+                     "actions": len(found), "by_source": by})
+    print(f"actions: {len(found)} {by}")
+
+
 def site(args) -> None:
     from ucestvuj import site as source
     wrong = source.build(Path(args.out))
@@ -95,6 +106,7 @@ def main() -> int:
         ("consultations", consultations, "every topic on eKonsultacije"),
         ("list", sites_list, "the municipalities' sites: izborna-analiza's list, copied (says what changed)"),
         ("sites", sites, "what each municipality's own site is and links to"),
+        ("actions", actions, "actions to join: blood drives, volunteer shifts, clean-ups and plantings (after `sites`)"),
         ("announcements", announcements, "public debates and inspections the municipalities announce on their sites"),
     ):
         commands.add_parser(name, help=about).set_defaults(run=run)

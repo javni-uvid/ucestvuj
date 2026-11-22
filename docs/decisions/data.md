@@ -179,8 +179,7 @@ another way) at the cost of sending the municipalities' texts to a model and of 
 22 Nov 2026, the maintainer: "find the sources first, for all of these"; and, mid-task, "we can go outside the
 municipal sites as long as the source is positive and publishes actions". Five readings of the open web by
 agents, each page opened (a plain request or a fetch that summarises the page: field lists from the latter are
-second-hand), then the key claims asked again directly here. Not a reading of any source into `data/`: nothing
-below is built yet. "Unverified" is said where it applies; where a source answered nothing, that is not a proof
+second-hand), then the key claims asked again directly here. The sources it names are read into `data/actions.json` as the last sections say. "Unverified" is said where it applies; where a source answered nothing, that is not a proof
 that nothing exists.
 
 ### What the municipalities' sites already show
@@ -268,24 +267,56 @@ the assembly, 53 the local communities, 23 surveys or consultations, 2 petitions
 - **A fetch that summarises a page** was the agents' tool for several pages; every field named above that was
   not asked again here is second-hand until a reader of ours reads it.
 
-### The rule for the sources outside institutions (proposed, the maintainer's to decide)
+### The page of actions, and the rule for its sources (decided 22 Nov 2026)
 
-Principle 2 as it stands says the facts come from an institution's own publication, and the work actions are
-mostly not an institution's. The maintainer's words of 22 Nov 2026 allow other sources "as long as the source
-is positive and publishes actions". The reading below is the agent's, to be confirmed or changed, and
-`AGENTS.md`'s principle is not changed until it is:
+The maintainer, 22 Nov 2026: "we make a separate tab from the public debates; put all public actions for
+improving the environment, giving blood, positive initiatives there"; and: "we may go outside the municipal sites
+as long as the source is positive and publishes actions"; and, on news and social networks: "we can, as long as
+we say it is the source".
 
-- the organizer itself publishes the action, in a list of events or positions of its own (not in news, not on a
-  social network, not a news report about it); the organizer's page is the source and every row links it;
-- the same rule for every organizer (principle 1); the page says who the organizer is and that it is not an
-  institution;
-- the organizers found to publish such a list today: the Novi Sad volunteer service, Zavrni rukave and the
-  Vojvodina volunteer centre. The rest of some twenty looked at publish news, appeals for donations or
-  political messages, with no list of actions;
-- an action whose call is political (the current drive of Zavrni rukave removes political graffiti left after
-  the election; Kreni-Promeni and Ne davimo Beograd mix actions with political messages and donation appeals) is
-  the open question: whether the rule looks at the call's content, which is a judgement (principle 3), or only
-  at whether the organizer publishes a list of actions open to anyone.
+- **A page of its own, "Akcije",** beside the debates' page: things to do, with a place and a day. Debates, public
+  inspections and consultations stay where they were.
+- **Who may be the source:** an institution, as before; and for this page also an organizer that is not one (an
+  association, a group of citizens), news and a social network, as long as the row says that this is the source
+  and links it. The organizer or the reporter is named on every row ("Извор: …"). Nothing from a source of this
+  kind is a rule, a number or a deadline of the law, and no person's contact is carried (principle 4).
+- **Not built, and why:** a social network's pages are not read by a program (they ask for a login, and their
+  terms forbid it), so for now what is read is what a site publishes in the open. A news site is read when it
+  has a feed worth reading; none has been added.
+- **"Positive" is the maintainer's word,** for an action that does good to the place or to the people in it. The
+  rule applied is the same for every organizer (principle 1): the organizer itself publishes the action, in a
+  list of events or positions or in a post that names a day, open to anyone. What is open to anyone and what is
+  closed (a drive for a firm's employees) is said when the organizer says it: the Institute for Blood Transfusion
+  of Serbia marks such lines, and they are left out; where a source doesn't say, the page tells the reader to ask
+  the organizer.
+- **Open question (the maintainer's):** whether a call that is political is left out by its content, which is a
+  judgement (principle 3), or only by the rule above. The one such source found, the drive of Zavrni rukave to
+  remove political graffiti after the election, has no reader yet and is not on the page.
+
+### What is read into `data/actions.json` (`ucestvuj actions`, by hand for now)
+
+On 22 Nov 2026: 54 actions to come, 30 from the blood transfusion institute of Vojvodina, 21 from the Institute
+for Blood Transfusion of Serbia (the closed ones left out), 3 from the volunteer service of Novi Sad. Each keeps
+the kind (blood, volunteer, environment), who announces it, the place and venue, the title as the source wrote it
+(the Institutes' lines have none: "Добровољно давање крви: <place>" is ours), the address of the announcement,
+the day, the hours and, for a position, the deadline. Never a contact.
+
+- **The institutes' lists are read each by its own form** (`actions.transfusion_vojvodina`, `transfusion_serbia`):
+  calendar links, and a card per day with the hours as text. A source that doesn't answer is skipped.
+- **The volunteer service's positions** are read through its public API, the fields about the action only
+  (`actions.volunteer_service`); the hours are taken from its sentence only when it says them whole.
+- **The municipalities' own posts** (the 51 WordPress sites) are searched for a call to give blood, to clean, to
+  plant or to volunteer (`actions.of_municipality`): a title that says what it is and that it calls, not over,
+  and a text that names a day from the post's own on. The first reading found 23 such posts, all of earlier
+  years (the newest is of January 2026), so none is on the page: municipalities announce such actions
+  rarely and mostly after the fact.
+- **Environment actions: none on the page today.** No source found publishes a dated call to clean or to plant
+  ahead of the day (the state's bodies publish news, the volunteer service's positions are event shifts). The
+  kind is there, and the page says that there are few.
+- **Only what is ahead is kept** when read; the page lists what ends today or later, the nearest day first.
+- **Not read:** the Red Cross of Belgrade's list (the same lines as the Institute's, some differing), the plan
+  of the Niš institute (a PDF a week), the Vojvodina volunteer centre's calendar (one past event), and Zavrni
+  rukave (its days have no year; a weekday beside the day would settle it, and the political question above).
 
 ## Where the rest of what a citizen can take part in is
 
