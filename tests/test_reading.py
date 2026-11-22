@@ -238,3 +238,17 @@ def test_a_readers_report_is_taken_only_whole():
     rows = [whole, {**whole, "kind": "party"}, {**whole, "url": "a.rs/k"}, {**whole, "start": ""}, {**whole, "organizer": ""}]
     [taken] = actions.reported(rows)
     assert (taken["how"], taken["source"], taken["end"]) == ("report", "report", "2026-12-01")
+
+
+def test_the_register_text_is_read_into_articles():
+    from ucestvuj import laws
+    page = ("<p>ЗАКОН</p><p>о нечему</p><p>“Службени гласник РС”, бр. 1 од 1. јануара 2020.</p><p>I ОСНОВНЕ ОДРЕДБЕ</p><p>Предмет закона</p><p>Члан 1.</p><p>Овим законом се уређује нешто.</p>"
+            "<p>Друго, ово је други став;</p><p>*Службени гласник РС, број 105/2021</p>"
+            "<p>II ИСКЉУЧЕЊЕ И ОГРАНИЧЕЊЕ ПРИСТУПА</p><p>Права и ограничења</p><p>Члан 2.</p><p>Само један став.</p>"
+            "<p>Члан 2а</p><p>Додати члан.</p><p>ОДРЕДБЕ КОЈЕ НИСУ УНЕТЕ У ПРЕЧИШЋЕН ТЕКСТ</p><p>Члан 1.</p><p>Не чита се.</p>")
+    got = laws.articles(laws.plain(page.replace("</p>", "</p>\n\n")))
+    assert [(a["number"], a["heading"], a["paragraphs"], a["notes"]) for a in got] == [
+        ("1", "I ОСНОВНЕ ОДРЕДБЕ · Предмет закона", ["Овим законом се уређује нешто.", "Друго, ово је други став;"], ["Службени гласник РС, број 105/2021"]),
+        ("2", "II ИСКЉУЧЕЊЕ И ОГРАНИЧЕЊЕ ПРИСТУПА · Права и ограничења", ["Само један став."], []),
+        ("2а", "", ["Додати члан."], []),
+    ]

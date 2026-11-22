@@ -17,7 +17,7 @@ read that day.
 
 | Source | What it gives | How it is read | State |
 |---|---|---|---|
-| Pravno-informacioni sistem (pravno-informacioni-sistem.rs), the Official Gazette's register | The consolidated text of every law, with a stable address per act (`/eli/rep/sgrs/skupstina/zakon/2007/129/2/reg` is the Law on Local Self-Government) | The address answers, but the page is a script that draws the text in a frame; no documented API was found in its code. How the text itself is fetched is not solved yet. | Checked: address stable, text not read |
+| Pravno-informacioni sistem (pravno-informacioni-sistem.rs), the Official Gazette's register | The consolidated text of every law, with a stable address per act (`/eli/rep/sgrs/skupstina/zakon/2007/129/2/reg` is the Law on Local Self-Government) | The address answers, but the page is a script that draws the text in a frame; no documented API was found in its code. How the text itself is fetched is not solved yet. Read by `ucestvuj laws` (`laws.py`), see "The text of the laws" below. | Checked: address stable, text read (22 Nov 2026) |
 | lexifina/serbia-law (GitHub) and its API (global-law.lexifina.com, no key) | The same register read into one file per article, every version with the day it took effect; also 4,034 local acts of 20 cities and municipalities | git clone or JSON. Another project's reading of the register: by principle 2 it finds and checks, and the quoted article is compared with the register before it is published. Its licence is not a standard one: read it before taking text from it. | Checked: exists, pushed 15 Nov 2026 |
 
 The laws the guides rest on (to confirm, each against the register, with the articles):
@@ -33,6 +33,26 @@ The laws the guides rest on (to confirm, each against the register, with the art
 - Law on Environmental Impact Assessment: public inspection and debate on a study.
 - Law on Public Assembly: announcing a gathering.
 - Law on the Protector of Citizens, and General Administrative Procedure: complaints about a body's work.
+
+## The text of the laws (22 Nov 2026)
+
+The register's page is a script, and its own calls are public: `/bandleportalconf.txt` lists the hosts, and
+`https://reg.pravno-informacioni-sistem.rs/api/` answers `GetLawActTimeline?guid=<act>` (the versions, each with
+the day it took effect) and `viewAct/<act>?lawActId=<version>` (the consolidated text of one version, as HTML).
+The act's guid is the one in the register's own address `/reg/viewAct/<guid>`; the `/eli/...` path resolves to a
+different guid (the amending act's) and was not used. These are not a documented API: if a call stops
+answering, the reading fails and the last text stays (`data/laws.json`).
+
+- **`ucestvuj laws` reads each law in `laws.LAWS` into `data/laws.json`:** title, the gazette numbers, the day the
+  version took effect, the register's address, and per article its number, heading, paragraphs word for word and
+  the amendment notes ("Службени гласник РС, број 105/2021"). What the register leaves out of the consolidated
+  text (its footer on earlier amending acts) is not read.
+- **Checked against the register's own text and against lexifina/serbia-law** (its reading of the same register,
+  licence: the laws are not protected works, its arrangement is CC0): the Law on Free Access to Information of
+  Public Importance, 52 articles, version in force from 16 Feb 2022 (with the 105/2021 amendments). Of the 50
+  articles that both have, all 50 are the same word for word (compared without spaces and punctuation); articles
+  13 and 48 are deleted in the register. lexifina is therefore a means to check, as principle 2 says, and not a source.
+- **Also found:** the articles 28а and 28б exist (added by 105/2021) and are written without a full stop.
 
 ## A municipality's statute
 
