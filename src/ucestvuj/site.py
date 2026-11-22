@@ -435,7 +435,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 <p>Грешку пријавите на <a href="{REPO}/issues">GitHub-у</a>.</p>
 """)
 
-    pages["zahtev.html"] = guide.page(data["laws"]["access"])
+    pages["zahtev.html"] = guide.page(data["laws"]["access"], data["laws"]["procedure"])
 
     if out.exists():
         shutil.rmtree(out)

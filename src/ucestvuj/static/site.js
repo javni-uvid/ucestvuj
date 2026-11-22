@@ -83,35 +83,36 @@
   apply();
 })();
 
-/* The letter of the guide to the request for information: the form fills the blanks of a letter that stands in the
-   page without it. What is typed is put into the letter in this page and goes nowhere: no request, no storage. The
-   blanks are the fields' own placeholders (square brackets), so the letter reads the same in either script. */
-(function () {
+/* The letters of the guide to the request for information (the request, the complaint): a form fills the blanks of a
+   letter that stands in the page without it. What is typed is put into the letter in this page and goes nowhere: no
+   request, no storage. The blanks are the fields' own placeholders (square brackets), so a letter reads the same in
+   either script. */
+Array.prototype.forEach.call(document.querySelectorAll(".writer"), function (box) {
   "use strict";
-  var form = document.getElementById("pismo-forma");
-  var letter = document.getElementById("pismo");
+  var form = box.querySelector("form");
+  var letter = box.querySelector("textarea[readonly]");
   if (!form || !letter) return;
   var template = letter.value;
   var fields = Array.prototype.slice.call(form.querySelectorAll("input, textarea, select"));
   function fill() {
     var text = template;
-    fields.forEach(function (field) {
+    fields.forEach(function (field) {  // in order: a chosen sentence may hold blanks that a later field fills
       var token = field.getAttribute("data-token") || field.getAttribute("placeholder");
       var value = field.tagName === "SELECT" ? field.options[field.selectedIndex].text : field.value.trim();
       if (token && value) text = text.split(token).join(value);
     });
     letter.value = text;
   }
-  var copy = document.getElementById("pismo-kopija");
-  var state = document.getElementById("pismo-stanje");
+  var copy = box.querySelector("button");
+  var state = box.querySelector("[role=status]");
   if (copy && navigator.clipboard) {
     copy.hidden = false;
     copy.addEventListener("click", function () {
-      navigator.clipboard.writeText(letter.value).then(function () { state.textContent = copy.getAttribute("data-done") || "Копирано."; });
+      navigator.clipboard.writeText(letter.value).then(function () { state.textContent = copy.getAttribute("data-done"); });
     });
   }
   form.hidden = false;
   form.addEventListener("input", fill);
   form.addEventListener("submit", function (e) { e.preventDefault(); });
   fill();
-})();
+});

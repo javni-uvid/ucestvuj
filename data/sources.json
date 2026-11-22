@@ -49,6 +49,10 @@
    "access": {
     "articles": 52,
     "in_force_from": "2022-02-16"
+   },
+   "procedure": {
+    "articles": 217,
+    "in_force_from": "2023-01-13"
    }
   },
   "read": "2026-11-22"

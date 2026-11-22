@@ -20,6 +20,7 @@ PAGE = "https://pravno-informacioni-sistem.rs/reg/viewAct/"
 # The laws the guides rest on: key, the register's guid of the act. More are added when a guide needs them.
 LAWS = {
     "access": {"guid": "0b7f7931-f230-45cf-b550-a1495539249d"},  # Law on Free Access to Information of Public Importance
+    "procedure": {"guid": "3544aef0-85fd-4733-8214-e8bb95edf4af"},  # Law on General Administrative Procedure
 }
 
 # "Члан 12." and, for an article added later, "Члан 28а" (no full stop)
@@ -32,7 +33,7 @@ def plain(page: str) -> str:
     """The page as lines of text: no markup, no style, one space between words."""
     page = re.sub(r"(?is)<(script|style).*?</\1>", "", page)
     page = re.sub(r"(?i)<br\s*/?>|</p>|</div>|</tr>", "\n", page)
-    text = html.unescape(re.sub(r"<[^>]+>", "", page)).replace("\xa0", " ")
+    text = html.unescape(re.sub(r"<[^>]+>", "", page)).replace("\xa0", " ").replace("\r", "")
     return re.sub(r"[ \t]+", " ", text)
 
 
@@ -77,7 +78,7 @@ def fetch(key: str) -> dict:
     text = plain(page)
     head = text[:text.find("Члан")]
     title = re.search(r"ЗАКОН\s+([^\n]+)\n", head)
-    gazette = re.search(r"“Службени гласник РС”,.*?\d{4}\.\s*(?:\n|$)", head, re.S)
+    gazette = re.search(r"[“\"]Службени гласник РС[”\"],.*?(?:\n\s*\n|$)", head, re.S)
     return {
         "title": ("Закон " + title.group(1).strip()) if title else "",
         "gazette": re.sub(r"\s+", " ", gazette.group(0)).strip() if gazette else "",
