@@ -1,6 +1,8 @@
 """The site built from the data in the repository: no source is asked."""
 
 import datetime
+import html
+import re
 from pathlib import Path
 
 from ucestvuj import site
@@ -123,3 +125,28 @@ def test_the_page_of_actions_says_what_kind_of_source_a_row_has_and_how_to_repor
     assert "Извор: Zasadi drvo<" in site.action_card({**row, "how": ""})
     form = (Path(site.ROOT) / ".github" / "ISSUE_TEMPLATE" / "akcija.yml").read_text(encoding="utf-8")
     assert "template=akcija.yml" in site.ACTION_REPORT and "Ne upisujte lične podatke" in form and "required: true" in form
+
+
+def test_the_guide_quotes_the_law_word_for_word_and_the_letter_has_the_same_blanks_in_both_scripts(tmp_path):
+    import json
+    from ucestvuj import guide
+    law = json.loads((site.DATA / "laws.json").read_text(encoding="utf-8"))["access"]
+    out = tmp_path / "s"
+    site.build(out, datetime.date(2026, 11, 22))
+    cyr = (out / "cir" / "zahtev.html").read_text(encoding="utf-8")
+    lat = (out / "zahtev.html").read_text(encoding="utf-8")
+    # every quoted paragraph is a paragraph of the law as read (the quote is taken from it, so the page and the law agree)
+    first = next(a for a in law["articles"] if a["number"] == "15")["paragraphs"][3]
+    assert first in html.unescape(cyr)
+    assert law["url"] in cyr and "Службени гласник РС" in cyr
+    # the blanks of the letter are the fields' placeholders, in Cyrillic and, turned letter by letter, in Latin
+    for script, page in (("cyr", cyr), ("lat", lat)):
+        letter = re.search(r'<textarea id="pismo"[^>]*>(.*?)</textarea>', page, re.S).group(1)
+        for slot in guide.SLOT.values():
+            token = html.escape(slot) if script == "cyr" else html.escape(latin(slot))
+            assert token in letter or html.unescape(token) in html.unescape(letter), (script, slot)
+        assert html.unescape(letter).count("[") == 6
+    assert re.search(r'placeholder="\[naziv organa vlasti\]"', lat) and 'data-token="[šta tražite]"' in lat
+    # the Commissioner's address on the page is the catalogue's
+    catalogue = (site.DATA / "bodies.csv").read_text(encoding="utf-8")
+    assert all(part in catalogue for part in guide.COMMISSIONER_IN_CATALOGUE)

@@ -17,7 +17,7 @@ import shutil
 import unicodedata
 from pathlib import Path
 
-from ucestvuj import when
+from ucestvuj import guide, when
 from ucestvuj.announcements import held, topic as topic_of
 from ucestvuj.sites import REPORT
 from ucestvuj.translit import CYRILLIC, latin, latin_page, text_of
@@ -80,7 +80,7 @@ def load() -> dict:
     with (DATA / "municipal_sites.csv").open(encoding="utf-8", newline="") as f:
         listed = list(csv.DictReader(f))
     return {"announcements": read("announcements.json"), "actions": read("actions.json"), "sites": read("sites.json"),
-            "consultations": read("consultations.json"), "sources": read("sources.json"), "listed": listed}
+            "consultations": read("consultations.json"), "laws": read("laws.json"), "sources": read("sources.json"), "listed": listed}
 
 
 # ---- the frame of every page
@@ -139,6 +139,7 @@ def frame(path: str, script: str, title: str, description: str, main: str, read:
   <nav aria-label="Сајт">
     <a href="{home}index.html">Расправе</a>
     <a href="{home}akcije.html">Акције</a>
+    <a href="{home}zahtev.html">Водич</a>
     <a href="{home}opstine.html">Општине</a>
     <a href="{home}drzava.html">Држава</a>
     <a href="{home}o-projektu.html">О пројекту</a>
@@ -402,7 +403,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
     sources = data["sources"]
     srows = []
     for key, label in (("announcements", "Сајтови општина"), ("consultations", "еКонсултације"), ("bodies", "Каталог органа јавне власти, Повереник"),
-                       ("municipalities", "Контакт подаци општина, министарство"), ("tasks", "Послови локалне самоуправе, министарство"), ("actions", "Акције: заводи за трансфузију, волонтерски сервис, општине")):
+                       ("municipalities", "Контакт подаци општина, министарство"), ("tasks", "Послови локалне самоуправе, министарство"), ("laws", "Закони: регистар Службеног гласника"), ("actions", "Акције: заводи за трансфузију, волонтерски сервис, општине")):
         s = sources.get(key)
         if s:
             where = f'<a href="{esc(s.get("page") or s.get("url") or "")}">{esc(s.get("title") or label)}</a>' if (s.get("page") or s.get("url")) else esc(label)
@@ -427,12 +428,14 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 </ul>
 <h2>Шта још није овде</h2>
 <ul>
-<li>Водичи кроз то како се учествује (збор грађана, грађанска иницијатива, јавна расправа, захтев за информације од јавног значаја), сваки корак са чланом закона на коме почива.</li>
+<li>Водичи кроз остале начине да се учествује (грађанска иницијатива, збор грађана, јавна расправа): први је <a href="{{home}}zahtev.html">захтев за информације од јавног значаја</a>, сваки корак са чланом закона на коме почива. Остали чекају статуте општина.</li>
 <li>Општине чије објаве још не умемо да прочитамо, и место расправе: објава га наводи у тексту, а ми из њега читамо само када је шта.</li>
 <li>Јавни увиди у планове које објављују министарство, покрајина и заводи за урбанизам, и процене утицаја на животну средину.</li>
 </ul>
 <p>Грешку пријавите на <a href="{REPO}/issues">GitHub-у</a>.</p>
 """)
+
+    pages["zahtev.html"] = guide.page(data["laws"]["access"])
 
     if out.exists():
         shutil.rmtree(out)
