@@ -164,6 +164,17 @@ How the dates are established (`when.py`):
   committed): 745 of the 1,088 announcements with a day of publication give at least one period or day; of
   1,309 found, 509 are periods, 524 days, 199 ends, 77 starts; 123 have no name. The last 30 days' were read
   one by one against their texts.
+- **How often the reading is wrong** (22 Nov 2026, the maintainer: "let's check", on whether a model should read
+  the text a second time). 30 of the 743 announcements with something read (a random sample, read against the
+  sentences they came from, all years): 27 fully right; **3 with a wrong or misleading item**. Two are fixed with
+  a test each: the day a newspaper printed the notice ("оглас, Вечерње новости од 06.08.2024.") was read as the
+  start of the remarks, and the day a session was moved from ("уместо како је раније било објављено у среду
+  15. априла") as a day in the announcement; the fixes change 14 of 1,070 readings, each one item fewer, all the
+  kind named. The third is left: a session's day read as the inspection's, because the words just before it
+  ("po završetku javnog uvida") name the inspection. Minor and left: a period's end said again as its own item,
+  a hour written "11 00" missed, "rani j avni uvid" spaced out so the kind is not named. About one announcement
+  in ten has an item a reader could take wrong; the days themselves were right in all but the two. This is a
+  sample of 30: it says the order of the error, not its exact rate.
 - **A mistake becomes a test.** Each wrong reading found (by us or by a reader's report) is added to
   `tests/test_reading.py` with the sentence that caused it, so the rule can be changed without losing what it
   already reads right. Nobody checks each announcement by hand.

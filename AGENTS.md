@@ -70,12 +70,18 @@ One more, this project's own:
 
 ## Open decisions (the maintainer's)
 
-- The site's address.
 - Which mechanisms come first (`docs/decisions/data.md` has a proposal).
 - Whether a municipality's statute is read by a model and checked by a person, or by a person only.
 - Whether a political call is left out of the page of actions by its content or only by the rule that the organizer
   itself publishes an action open to anyone (`docs/decisions/data.md`).
-- Whether a model reads an announcement's text a second time, beside the program (`docs/decisions/data.md`).
+- Whether a model reads an announcement's text a second time, beside the program: the program was checked on a
+  sample on 22 Nov 2026 (`docs/decisions/data.md`, "How often the reading is wrong") and a second reading waits
+  for a larger check.
+- What reads news or a social network for the page of actions (the maintainer allowed it on 22 Nov 2026; none is
+  read yet, since a program can't read a social network).
+
+Decided on 22 Nov 2026: the site stays a preview on GitHub Pages for now; no domain and no link from the family's
+other sites yet.
 
 Decided on 21 Nov 2026 (`docs/decisions/site.md`, `docs/decisions/data.md`): a debate that was held is shown as
 held, apart from the calls; public officials in a title are kept, a title naming an applicant is not shown; the

@@ -201,3 +201,14 @@ def test_a_source_that_fails_or_changed_its_form_keeps_its_earlier_rows(monkeypa
     assert [(a["source"], a["place"]) for a in quick] == [("ztkv", "Vrbas"), ("itks", "Шабац"), ("municipality", "Ада")]
     # the earlier row of a source that was read is replaced by what it says now, not kept beside it
     assert "Ruma" not in str(quick)
+
+
+def test_a_day_that_is_the_newspapers_or_was_changed_is_not_read():
+    # found in a sample of 30 (22 Nov 2026): the day a newspaper printed the notice was read as the start of the
+    # remarks, and the day a session was moved from as a day in the announcement
+    paper = ("Примедбе се могу доставити и на e-mail: x@y.rs. Оглас, Вечерње новости од 06.08.2024. године, Обавештење о јавном увиду. "
+             "Јавни увид трајаће 30 дана, почев од 05.08.2024. године, па закључно са 04.09.2024. године.")
+    assert short(paper, "2024-08-06") == [("inspection", "2024-08-05", "2024-09-04", 0, "")]
+    moved = ("Јавна седница Комисије за јавни увид биће одржана у среду 22. априла 2026. године у 11 часова, у згради Градске управе, "
+             "уместо како је раније било објављено у среду 15. априла 2026. године у 11 часова.")
+    assert short(moved, "2026-04-15") == [("session", "2026-04-22", "2026-04-22", 0, "11:00")]
