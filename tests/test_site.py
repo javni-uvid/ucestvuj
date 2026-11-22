@@ -170,6 +170,20 @@ def test_the_guide_to_the_initiative_quotes_the_law_and_says_the_statutes_are_no
     page = html.unescape((out / "cir" / "inicijativa.html").read_text(encoding="utf-8"))
     article = next(a for a in law["articles"] if a["number"] == "69")
     assert all(p in page for p in article["paragraphs"])  # the whole of article 69, word for word
-    assert "Статуте општина још не читамо" in page
+    assert "Статуте општина читамо тек за неколико општина" in page and "није проверено" in page
     assert "inicijativa.html" in (out / "cir" / "vodici.html").read_text(encoding="utf-8")
     assert (out / "inicijativa.html").exists() and (out / "vodici.html").exists()
+
+
+def test_every_value_read_from_a_statute_is_in_the_sentence_quoted_for_it():
+    import json
+    rows = json.loads((site.DATA / "statutes.json").read_text(encoding="utf-8"))
+    assert len(rows) >= 6
+    for r in rows:
+        assert r["checked"] is False or r.get("checked_by")  # a reading is marked as checked only with who checked it
+        for key in ("assembly_quorum", "initiative_signatures"):
+            f = r[key]
+            assert f["quote"].count(str(f["percent"])) >= 1, (r["name"], key)  # the number is in the sentence
+        n = r["convened_by_citizens"].get("number")
+        assert n is None or str(n) in r["convened_by_citizens"]["quote"], r["name"]
+        assert r["statute"]["url"].startswith("https://")

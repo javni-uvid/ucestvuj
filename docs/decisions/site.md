@@ -212,4 +212,8 @@ same way as the first guide: our words marked, the law's word for word, the vers
   guide gives what the law gives all the municipalities, the same for each (principle 1), and the statutes
   are read when a guide needs a number from them: a model reads, a person checks (22 Nov 2026), starting with
   municipalities lexifina has, which are mostly Belgrade's own (the fields have to hold before all are read).
+- **Update (22 Nov 2026): a table of the six statutes read** (step 6: who may convene an assembly, how many must be
+  present, signatures for an initiative), each row with the statute's link and, folded, the article and sentence of
+  every field. Marked "Проба, и није проверено": the maintainer's decision is that a person checks what a model
+  read; no row is `checked` yet.
 - **No letter-writer here:** the law gives no form for a proposal, and a statute may.

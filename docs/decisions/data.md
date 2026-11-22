@@ -73,6 +73,19 @@ always as a PDF on its own site; there is no central, machine-readable collectio
 | Each municipality's own site and gazette | The statute itself | Not read |
 | data.gov.rs, "decisions in the public interest" (about 25 cities, mostly one upload in May 2022) | Lists of local decisions | Seen in the survey of 20 Nov; stale |
 
+**A pilot of six, 22 Nov 2026 (`data/statutes.json`).** Statutes are found on the municipalities' own sites with the
+WordPress search (`wp-json/wp/v2/media?search=статут`): of 49 sites that answer, 25 had one. Ten were tried; six were
+read (Кнић, Лозница, Петровац на Млави, Пландиште, Стари Град, Ужице). Three are scans without text (Бачка Паланка,
+Велика Плана, Земун; no OCR here) and one address gave a page, not a file (Смедеревска Паланка). Fields: the area a
+citizens' assembly is convened for, whether and how many citizens may convene it, how many must be present, and the
+signatures for a citizens' initiative. Each field holds the article and the statute's own sentence, and a test
+checks that the number is in the sentence. **Every row says `checked: false`:** a model read it, a person has not
+checked it yet; the page says so. The statutes differ (Лозница: citizens do not convene, 10% present; Стари Град:
+10%; the others 30 or 50 citizens and 5%), which is why a guide cannot say it for all.
+**Currency is the risk:** the file a site offers may not be the statute in force (the gazette's latest consolidated
+text is; Пландиште's is of Dec 2018, Кнић's and Лозница's of 2019), so the page says it is the statute as the site
+had it and from which day.
+
 **Decided 22 Nov 2026: a model reads the statute and a person checks it.** What the statute is read for is a small, fixed set of fields per mechanism (a number of signatures, who calls,
 a deadline, the article), so a municipality is a row, not a text. A start with the 20 municipalities already
 read elsewhere, or with the largest cities, shows whether the fields hold before all are read.

@@ -80,7 +80,7 @@ def load() -> dict:
     with (DATA / "municipal_sites.csv").open(encoding="utf-8", newline="") as f:
         listed = list(csv.DictReader(f))
     return {"announcements": read("announcements.json"), "actions": read("actions.json"), "sites": read("sites.json"),
-            "consultations": read("consultations.json"), "laws": read("laws.json"), "sources": read("sources.json"), "listed": listed}
+            "consultations": read("consultations.json"), "laws": read("laws.json"), "statutes": read("statutes.json"), "sources": read("sources.json"), "listed": listed}
 
 
 # ---- the frame of every page
@@ -436,7 +436,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 """)
 
     pages["zahtev.html"] = guide.page(data["laws"]["access"], data["laws"]["procedure"])
-    pages["inicijativa.html"] = guide.initiative_page(data["laws"]["local"])
+    pages["inicijativa.html"] = guide.initiative_page(data["laws"]["local"], sorted(data["statutes"], key=lambda r: azbuka(r["name"])))
     pages["vodici.html"] = guide.index_page()
 
     if out.exists():
