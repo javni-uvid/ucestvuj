@@ -43,6 +43,16 @@
   "topics": 679,
   "url": "https://ekonsultacije.gov.rs"
  },
+ "laws": {
+  "from": "the Official Gazette's register (pravno-informacioni-sistem.rs)",
+  "laws": {
+   "access": {
+    "articles": 52,
+    "in_force_from": "2022-02-16"
+   }
+  },
+  "read": "2026-11-22"
+ },
  "municipalities": {
   "kept": [
    "name",

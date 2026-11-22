@@ -94,6 +94,16 @@ def actions(args) -> None:
     print(f"actions: {len(found)} {by}")
 
 
+def laws(_args) -> None:
+    from ucestvuj import laws as source
+    found = {key: source.fetch(key) for key in source.LAWS}
+    save(DATA / "laws.json", found)
+    note("laws", {"from": "the Official Gazette's register (pravno-informacioni-sistem.rs)",
+                  "laws": {k: {"in_force_from": v["in_force_from"], "articles": len(v["articles"])} for k, v in found.items()}})
+    for key, law in found.items():
+        print(f'laws: {key}: {len(law["articles"])} articles, in force from {law["in_force_from"]}')
+
+
 def site(args) -> None:
     from ucestvuj import site as source
     wrong = source.build(Path(args.out))
@@ -112,6 +122,7 @@ def main() -> int:
         ("consultations", consultations, "every topic on eKonsultacije"),
         ("list", sites_list, "the municipalities' sites: izborna-analiza's list, copied (says what changed)"),
         ("sites", sites, "what each municipality's own site is and links to"),
+        ("laws", laws, "the text of the laws the guides rest on, from the Official Gazette's register"),
         ("announcements", announcements, "public debates and inspections the municipalities announce on their sites"),
     ):
         commands.add_parser(name, help=about).set_defaults(run=run)
