@@ -174,6 +174,150 @@ Proposed, the maintainer's to decide: a second reading of the same text by a mod
 with the program and listed for a person where it doesn't. It would catch what words can't (a sentence built
 another way) at the cost of sending the municipalities' texts to a model and of a person's time.
 
+## Other ways to take part: the sources
+
+22 Nov 2026, the maintainer: "find the sources first, for all of these"; and, mid-task, "we can go outside the
+municipal sites as long as the source is positive and publishes actions". Five readings of the open web by
+agents, each page opened (a plain request or a fetch that summarises the page: field lists from the latter are
+second-hand), then the key claims asked again directly here. The sources it names are read into `data/actions.json` as the last sections say. "Unverified" is said where it applies; where a source answered nothing, that is not a proof
+that nothing exists.
+
+### What the municipalities' sites already show
+
+One search of the posts of the 51 WordPress sites read (20 newest per word, a title must hold the word's stem;
+the first page's links of all 152 sites that answer are in `sites.json`):
+
+| Kind | Sites | Titles in 2026 | In the last 3 months | What the titles are |
+|---|---|---|---|---|
+| Sittings of the assembly | 38 | 113 | 38 | Calls with a day ("Saziv 18. sednice za 25.11.2026.") and news that it was held |
+| Reception of citizens | 14 | 36 | 14 | Mostly "held"; a standing rule ("every Thursday 10-12") in one dated post (Kula, Odžaci) |
+| Blood donation | 17 | 18 | 7 | Real calls with a term (Voždovac, weekly) |
+| Volunteers | 25 | 12 | 2 | News about volunteers, few calls |
+| Surveys | 23 | 6 | 1 | Surveys of a municipality or its utility; many are not about a decision |
+| Clean-ups | 16 | 4 | 0 | Seasonal, mostly news after the action |
+| Planting | 17 | 3 | 0 | Seasonal, mostly news after the action |
+| Members of councils and bodies | 8 | 2 | 0 | Real calls, rare |
+| Local community councils | 8 | 0 | 0 | Notices of elections when held (2021, 2023, 2025) |
+| Citizens' assembly | 3 | 0 | 0 | Almost nothing (the 2025 notices of Užice below) |
+
+Lower bounds: 20 posts per word and site, WordPress sites only. Of the 152 first pages, 95 link public calls, 92
+the assembly, 53 the local communities, 23 surveys or consultations, 2 petitions.
+
+### Sources outside the municipal sites
+
+| What | Source | One entry has | Form | State on 22 Nov 2026 |
+|---|---|---|---|---|
+| Blood drives | Zavod za transfuziju krvi Vojvodine, `transfuzija.rs/dobrovoljno-davanje-krvi/akcije-na-terenu/` | place, venue, day, start and end | HTML; the "add to calendar" links hold ISO start and end and the place (checked) | 20 Nov to 25 Nov listed |
+| | Institut za transfuziju krvi Srbije, `itks.rs/nedeljni-plan-ekipa.html` | per day: municipality, venue, hours as text ("9-15ч") | hand-written HTML, Cyrillic, a card per day (checked) | 22 to 29 Nov |
+| | Crveni krst Beograd, `crvenikrstbeograd.org.rs/blog/spisak-akcija-dobrovoljnog-davanja-krvi/` | same as the Institute's, some lines differ | HTML | 21 to 29 Nov (unverified by us) |
+| | Zavod za transfuziju Niš, `transfuzijanis.rs` | a weekly plan: municipality, venue, hours | one PDF a week, text layer, the link changes | 23 to 29 Nov |
+| | Crveni krst Srbije | no schedule of its own; links the four above | HTML | n/a |
+| People's initiative | eUprava, `elusluge.euprava.gov.rs/einitiative/eserviceapi/Initiative/GetActiveInitiatives` | unknown: the list is empty | JSON, no login (checked: `[]`, 200); undocumented, found in the app's script | no active initiative today. Supporting one needs an e-certificate or the ConsentID app, by territory |
+| Working groups | Ministry for Human and Minority Rights, `minljmpdd.gov.rs/wp-json/wp/v2/posts?categories=71` | title, day, the deadline in the text, annexes as Word | WordPress API (checked); the category also holds the ministry's own job competitions | about a call a month; the newest call 3 Aug 2026 (the law on climate change) |
+| Assembly | Calendar, `parlament.gov.rs/php/calendar/calendar_ajax.php?display=list&startDate=…&endDate=…&cats1=0` | day, hour, title with the place | HTML fragments; its RSS is empty | sittings and committees seen; a public hearing's place in it not seen |
+| | Public hearings, `parlament.gov.rs/…/јавна-слушања.2891.html` | day, title, agenda, annexes | HTML table | past ones only (the last 21 Aug 2026) |
+| Sittings of city assemblies | Novi Sad `skupstina.novisad.rs`, Subotica `subotica.ls.gov.rs` | announcement in prose: day, hour, place, number of items | WordPress feed and API | no sitting announced now |
+| | Beograd `beograd.rs/cir/najave` | day, hour, place, number of the sitting, on each entry's page only | HTML; the list has no dates | the next on 23 Nov 2026 |
+| | Kragujevac `kragujevac.ls.gov.rs` | news: day, hour, items in prose | HTML; the feed answered 403 to one client | 27 Nov 2026; Niš not found |
+| Citizens' assembly | Užice `uzice.rs` (2025: Lunovo Selo, Kremna, Drežnik, Dubočko) | day, hour, place, in a dated post and a PDF | WordPress | 2025; none in 2026 found |
+| Participatory budgeting | Sombor `sombor.rs` | vote until 20 Nov 2026, a paper ballot by the utility bill, three projects per local community | WordPress post | live |
+| Volunteer shifts | Novosadski volonterski servis, `nvs.rs/wp-json/wp/v2/positions` (checked) | start and end, place, application deadline, number of volunteers, hours, age, skills, the host | WordPress API, a post type of its own | three open: 24 Nov, 29 Nov, 6 Dec. The host's phone and e-mail are public in the API |
+| Work actions | Zavrni rukave, `zavrnirukave.rs` ("Lokacije i datumi") | place, weekday and day **without a year**, hour, what to bring, a map | HTML in the first response | the last on 15 Nov; nothing ahead |
+| | Volonterski centar Vojvodine, `volontiraj.rs/dogadjaji/?ical=1` | start, end, title, description | iCal | one event, 25 Apr 2026 |
+
+### What was not found
+
+- **No central source** for: calls for members of councils and bodies (youth, green, traffic safety, school
+  boards); elections of the local community councils (a municipal decision; Kragujevac's assembly decides on
+  27 Nov 2026 on the commissions for them); sittings of municipal assemblies; the municipalities' citizens'
+  assemblies; a municipal referendum or a samodoprinos (RIK's page for the 2026 local referendums holds no
+  rows; Ada's decision of 4 May 2026 is on its own site); participatory budgeting or surveys.
+- **Planting and clean-up calls by the state:** Srbijašume, Vojvodinašume and the Ministry of Environmental
+  Protection publish news, not dated calls to join. JKP Zelenilo Beograd's "Za zeleniji Beograd" closed on 15 Sep.
+- **Red Cross, volunteers and trainings:** the Serbian Red Cross has no list of actions (news; a calendar of
+  commemorative days, last entry 6 Feb); a call to volunteer is made to one's local organization.
+- **Volunteer firefighters and civil protection:** no call found; the site of the Fire Brigades Association of
+  Serbia was not found.
+- **Polling boards and observers:** RIK has no page that says how a citizen joins a board (training, plans of
+  training for the 25 Oct 2026 election and forms for the minority councils' election of 8 Nov exist); who
+  proposes the members was said by an agent from memory and is not to be taken before the law is read.
+- **data.gov.rs:** its search answers 0 to every query, generic words included, so it proves nothing.
+- **Reports of problems are not events:** eUprava's "Prijava komunalnog problema" names 7 local governments
+  (Šabac, Krupanj, Mali Zvornik, Medveđa, Ćuprija, Knjaževac, Osečina); Beograd has the call centre 11011; the
+  national inspections form is `inspektor.gov.rs/submission` (a citizen, an organization or anonymous; the
+  environmental inspection too); the Protector of Citizens takes a complaint by e-mail, post, phone, in person
+  and generally not anonymous; the Commissioner's forms for a request and the complaints are Word files, and
+  `data.poverenik.rs` has 16 CSV datasets (a CKAN API, all changed 21 Sep 2026; only the catalogue's columns
+  were read, and it is read here already); the Anti-Corruption Agency has no citizen's channel on its pages. These
+  are for the guides (a body, an address, a form), not for a list of what is on.
+
+### What a program would meet
+
+- **The year is missing** on Zavrni rukave and on the Mountaineering Association's calendar: a day without a
+  year is not guessed (`when.py`'s rule), so such an entry has no day until the source writes one.
+- **Hours are free text** at the Institute and the Red Cross of Belgrade ("9-15ч", "14-18č"), a PDF at Niš,
+  calendar links at Vojvodina: four readers for one kind. The Institute's and the Red Cross of Belgrade's lists
+  differ in places, so a municipality's drive can be on one and not the other: both would be shown as theirs.
+- **`robots.txt`:** read for five of the sites. nvs.rs allows search and reference use and forbids training and
+  names crawlers, among them ClaudeBot; a program of ours that lists a position with a link is reference use,
+  and the page says so. itks.rs has none (404). Not read for the rest: before any site is read by a program, its
+  `robots.txt` and terms are.
+- **A person's contact** is public in NVS's API (a phone, a private e-mail): a position would be shown with the
+  host's name and the link, never the contact (principle 4).
+- **A fetch that summarises a page** was the agents' tool for several pages; every field named above that was
+  not asked again here is second-hand until a reader of ours reads it.
+
+### The page of actions, and the rule for its sources (decided 22 Nov 2026)
+
+The maintainer, 22 Nov 2026: "we make a separate tab from the public debates; put all public actions for
+improving the environment, giving blood, positive initiatives there"; and: "we may go outside the municipal sites
+as long as the source is positive and publishes actions"; and, on news and social networks: "we can, as long as
+we say it is the source".
+
+- **A page of its own, "Akcije",** beside the debates' page: things to do, with a place and a day. Debates, public
+  inspections and consultations stay where they were.
+- **Who may be the source:** an institution, as before; and for this page also an organizer that is not one (an
+  association, a group of citizens), news and a social network, as long as the row says that this is the source
+  and links it. The organizer or the reporter is named on every row ("Извор: …"). Nothing from a source of this
+  kind is a rule, a number or a deadline of the law, and no person's contact is carried (principle 4).
+- **Not built, and why:** a social network's pages are not read by a program (they ask for a login, and their
+  terms forbid it), so for now what is read is what a site publishes in the open. A news site is read when it
+  has a feed worth reading; none has been added.
+- **"Positive" is the maintainer's word,** for an action that does good to the place or to the people in it. The
+  rule applied is the same for every organizer (principle 1): the organizer itself publishes the action, in a
+  list of events or positions or in a post that names a day, open to anyone. What is open to anyone and what is
+  closed (a drive for a firm's employees) is said when the organizer says it: the Institute for Blood Transfusion
+  of Serbia marks such lines, and they are left out; where a source doesn't say, the page tells the reader to ask
+  the organizer.
+- **Open question (the maintainer's):** whether a call that is political is left out by its content, which is a
+  judgement (principle 3), or only by the rule above. The one such source found, the drive of Zavrni rukave to
+  remove political graffiti after the election, has no reader yet and is not on the page.
+
+### What is read into `data/actions.json` (`ucestvuj actions`, by hand for now)
+
+On 22 Nov 2026: 54 actions to come, 30 from the blood transfusion institute of Vojvodina, 21 from the Institute
+for Blood Transfusion of Serbia (the closed ones left out), 3 from the volunteer service of Novi Sad. Each keeps
+the kind (blood, volunteer, environment), who announces it, the place and venue, the title as the source wrote it
+(the Institutes' lines have none: "Добровољно давање крви: <place>" is ours), the address of the announcement,
+the day, the hours and, for a position, the deadline. Never a contact.
+
+- **The institutes' lists are read each by its own form** (`actions.transfusion_vojvodina`, `transfusion_serbia`):
+  calendar links, and a card per day with the hours as text. A source that doesn't answer is skipped.
+- **The volunteer service's positions** are read through its public API, the fields about the action only
+  (`actions.volunteer_service`); the hours are taken from its sentence only when it says them whole.
+- **The municipalities' own posts** (the 51 WordPress sites) are searched for a call to give blood, to clean, to
+  plant or to volunteer (`actions.of_municipality`): a title that says what it is and that it calls, not over,
+  and a text that names a day from the post's own on. The first reading found 23 such posts, all of earlier
+  years (the newest is of January 2026), so none is on the page: municipalities announce such actions
+  rarely and mostly after the fact.
+- **Environment actions: none on the page today.** No source found publishes a dated call to clean or to plant
+  ahead of the day (the state's bodies publish news, the volunteer service's positions are event shifts). The
+  kind is there, and the page says that there are few.
+- **Only what is ahead is kept** when read; the page lists what ends today or later, the nearest day first.
+- **Not read:** the Red Cross of Belgrade's list (the same lines as the Institute's, some differing), the plan
+  of the Niš institute (a PDF a week), the Vojvodina volunteer centre's calendar (one past event), and Zavrni
+  rukave (its days have no year; a weekday beside the day would settle it, and the political question above).
+
 ## Where the rest of what a citizen can take part in is
 
 Not read yet; in the order of what each would add.

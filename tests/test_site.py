@@ -9,7 +9,7 @@ from ucestvuj.translit import CYRILLIC, latin, latin_page, text_of
 def test_the_site_builds_and_its_check_passes(tmp_path):
     out = tmp_path / "s"
     assert site.build(out, datetime.date(2026, 11, 21)) == []
-    for page in ("index.html", "opstine.html", "drzava.html", "o-projektu.html"):
+    for page in ("index.html", "akcije.html", "opstine.html", "drzava.html", "o-projektu.html"):
         assert (out / page).is_file() and (out / "cir" / page).is_file()
     home = (out / "index.html").read_text(encoding="utf-8")
     assert 'name="robots" content="noindex"' in home and home.count("<script") == 1 and "site.js?v=" in home
@@ -88,3 +88,26 @@ def test_only_the_sites_own_script_may_be_on_a_page():
     assert site.check(own, "cyr") == []
     assert site.check(own + "<script>alert(1)</script>", "cyr") and site.check('<script src="https://x.rs/a.js"></script>', "cyr")
     assert site.check(own + '<a onclick="x()">a</a>', "cyr")
+
+
+def test_the_page_of_actions_lists_what_is_ahead_with_its_source(tmp_path):
+    out = tmp_path / "s"
+    site.build(out, datetime.date(2026, 11, 22))
+    page = (out / "cir" / "akcije.html").read_text(encoding="utf-8")
+    cards = page.split('<ol id="lista" class="cards">')[1].split("</ol>")[0].split('<li class="card"')[1:]
+    assert cards and all("Извор: " in c and 'data-kind="' in c for c in cards)
+    starts = [c.split('data-days="')[1].split('"')[0].split()[0] for c in cards]
+    assert starts == sorted(starts) and starts[0] >= "2026-11-22"  # the nearest day first, nothing over
+    assert any('data-kind="blood"' in c for c in cards) and '<option value="blood">Давање крви</option>' in page
+    assert '<form id="filter" class="filter" hidden' in page and "site.js?v=" in page
+    assert 'href="akcije.html"' in (out / "index.html").read_text(encoding="utf-8")  # the debates' page leads to it
+
+
+def test_an_action_says_where_what_and_when_and_never_a_contact():
+    row = {"kind": "volunteer", "source": "nvs", "organizer": "Новосадски волонтерски сервис", "place": "Град Нови Сад",
+           "title": "Зимски полумаратон", "url": "https://nvs.rs/volontiraj/x/", "start": "2026-12-06", "end": "2026-12-06",
+           "time": "од 8 до 14", "venue": "Петроварадин", "deadline": "2026-11-29", "code": ""}
+    shown = site.action_card(row)
+    assert 'data-place="novi-sad"' in shown and 'data-kind="volunteer"' in shown and "Извор: Новосадски волонтерски сервис" in shown
+    assert "<b>Волонтирање</b> 6. 12. 2026., од 8 до 14</li>" in shown and "<b>Рок за пријаву</b> до 29. 11. 2026.</li>" in shown
+    assert site.place_key("Градска општина Вождовац") == site.place_key("Вождовац")

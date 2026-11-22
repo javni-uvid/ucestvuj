@@ -36,6 +36,12 @@ The project's promises to its readers. Never changed without the maintainer. The
    own statute and decisions as it published them, and an institution's own datasets. A handbook of an
    organization, a news report or another project's reading of the law may help find or check something; it
    never supplies a rule, a number or a deadline.
+   - **For the page of actions only** (22 Nov 2026, the maintainer: "we may go outside the municipal sites as long
+     as the source is positive and publishes actions", and "news and social networks too, as long as we say it is
+     the source"): the source of an action may be an organizer that is not an institution, news or a social
+     network, if the row says that this is the source and links it. Never a rule, a number or a deadline of the
+     law, never a person's contact. Debates, inspections, consultations and the guides stay with institutions
+     (`docs/decisions/data.md`, "The page of actions, and the rule for its sources").
 3. **The site shows; it doesn't judge.** A guide says what the law gives and what a body must do. It does not
    say whether a municipality is good or bad at it, and it ranks none.
 4. **Only what a person does in public office.** A guide names the body and the office ("the president of the
@@ -67,6 +73,8 @@ One more, this project's own:
 - The site's address.
 - Which mechanisms come first (`docs/decisions/data.md` has a proposal).
 - Whether a municipality's statute is read by a model and checked by a person, or by a person only.
+- Whether a political call is left out of the page of actions by its content or only by the rule that the organizer
+  itself publishes an action open to anyone (`docs/decisions/data.md`).
 - Whether a model reads an announcement's text a second time, beside the program (`docs/decisions/data.md`).
 
 Decided on 21 Nov 2026 (`docs/decisions/site.md`, `docs/decisions/data.md`): a debate that was held is shown as

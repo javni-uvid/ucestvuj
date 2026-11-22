@@ -12,7 +12,7 @@ project as the other two projects that use osnova have them"): javni-uvid/zailip
 They are rules for new code and for code being changed.
 
 - **A module per source and per kind of page.** A reader per source: `opendata`, `consultations`, `sites`,
-  `announcements` (with `when`: its periods and days); `web` is the one place a source is asked from. `site.py`
+  `announcements` (with `when`: its periods and days), `actions` (blood drives, volunteer shifts, clean-ups: one reader per source's form); `web` is the one place a source is asked from. `site.py`
   (some 430 lines) loads `data/`, works out what the pages share and writes them all; when a new kind of page
   comes (a guide, a letter-writer), it goes in a module of its own, called from `site.build` with what it
   needs. A move is checked by building before and after and comparing every file.
@@ -52,7 +52,7 @@ Not taken yet, to be weighed when the site gets its address: links without ".htm
 | list | Tuesdays, by hand | the list of the municipalities' sites copied from `javni-uvid/izborna-analiza`; starts **pages** |
 | osnova | daily, by hand | the organization's shared rules, look and tools copied into `osnova/` |
 
-The readings (`opendata`, `consultations`, `sites`, `announcements`) are run by hand for now; no workflow asks a
+The readings (`opendata`, `consultations`, `sites`, `announcements`, `actions`) are run by hand for now; no workflow asks a
 source. A run started with `GITHUB_TOKEN` can start another workflow (`gh workflow run`), which is how **list**
 starts **pages**: a push by a workflow's own token starts none.
 

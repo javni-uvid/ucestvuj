@@ -1,4 +1,14 @@
 {
+ "actions": {
+  "actions": 54,
+  "by_source": {
+   "itks": 21,
+   "nvs": 3,
+   "ztkv": 30
+  },
+  "from": "the blood transfusion institutes, the volunteer service of Novi Sad and the municipalities' own posts",
+  "read": "2026-11-22"
+ },
  "announcements": {
   "announcements": 1530,
   "from": "the municipalities' own sites (data/sites.json)",

@@ -11,7 +11,7 @@ the same commit as the change.
   the day the data was read. The site is not in `osnova/design/sites.json`, so the family's other sites don't
   link it yet; its own bar and footer name it among them. A domain and the family's link are the maintainer's.
 - **Pages:** the first page (one list of what is ahead and of the last 30 days' announcements, with filters;
-  below), the municipalities in the Serbian alphabet with what is read from each, a page for each
+  below), the page of actions (below), the municipalities in the Serbian alphabet with what is read from each, a page for each
   municipality with announcements (by year, newest first), the state's consultations, and the project
   (sources with the day each was read, the rules, what is not here yet).
 - **The look is the family's** (`osnova/design/osnova.css`: Literata and the system font, black on white, the
@@ -100,6 +100,27 @@ is checked against them.
 Checked on 21 Nov 2026: the first page, a municipality's page and the municipalities' table at 320 and 390 px
 in both scripts (no page wider than its screen); rules 1, 2 and 8 by `tests/test_design.py`. Not done yet: a
 run of axe-core's WCAG 2.2 AA rules on every kind of page, as izborna-analiza does on a template's change.
+
+## The page of actions
+
+22 Nov 2026, the maintainer: "we make a separate tab from the public debates; put all public actions for improving
+the environment, giving blood, positive initiatives there".
+
+- **A page of its own, `akcije.html`,** with its own place in the bar ("Расправе | Акције | Општине | Држава"):
+  the first page keeps the debates, inspections and consultations; this one the things to do. The first page leads
+  to it in one sentence.
+- **The same row as the debates': where, what about, when.** The place (the municipality without "Град" or
+  "Градска општина"), the venue in grey under it; the title as the source wrote it, linked to the announcement;
+  the kind as a label (blood, volunteering, environment); the column of days: the day and the hours, a position's
+  application deadline, "Следећи дан: за 2 дана"; and under it **"Извор: <who announces>"**, on every row.
+- **The same filters, fewer:** place (the places that have an action), time (from today; something starts or ends
+  within 7 days), kind, a word; folded on a phone as on the first page; the choice is in the page's address. The
+  script is the same one (`static/site.js`, which takes the fields a page has).
+- **The order is the nearest day first;** what is over is not listed. The page says that not every action is open
+  to everyone (a firm's or an institution's own employees), and that there are few for the environment, since
+  organizers rarely announce them ahead.
+- **Who may be a source** and what is read are in `docs/decisions/data.md` ("The page of actions, and the rule for
+  its sources").
 
 ## What a page says
 
