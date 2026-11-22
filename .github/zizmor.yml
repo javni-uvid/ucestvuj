@@ -1,4 +1,4 @@
-# zizmor (the workflows' security check, security.yml). The osnova and list workflows commit and push a copy of the
+# zizmor (the workflows' security check, security.yml). The osnova, list and actions workflows commit and push a copy of the
 # organization's own files, so their checkouts keep the token on purpose; checkouts in jobs that don't push
 # keep none.
 rules:
@@ -6,3 +6,4 @@ rules:
     ignore:
       - osnova.yml
       - list.yml
+      - actions.yml

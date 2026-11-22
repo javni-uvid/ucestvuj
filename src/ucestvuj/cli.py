@@ -77,10 +77,12 @@ def announcements(_args) -> None:
     print(f'announcements: {len(found)} from {len({f["code"] for f in found})} municipalities')
 
 
-def actions(_args) -> None:
+def actions(args) -> None:
     from ucestvuj import actions as source
     seen = json.loads((DATA / "sites.json").read_text(encoding="utf-8"))
-    found = source.fetch(seen)
+    path = DATA / "actions.json"
+    before = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+    found = source.fetch(seen, before, municipalities=not args.quick)
     save(DATA / "actions.json", found)
     by = {s: sum(a["source"] == s for a in found) for s in sorted({a["source"] for a in found})}
     note("actions", {"from": "the blood transfusion institutes, the volunteer service of Novi Sad and the municipalities' own posts",
@@ -106,10 +108,12 @@ def main() -> int:
         ("consultations", consultations, "every topic on eKonsultacije"),
         ("list", sites_list, "the municipalities' sites: izborna-analiza's list, copied (says what changed)"),
         ("sites", sites, "what each municipality's own site is and links to"),
-        ("actions", actions, "actions to join: blood drives, volunteer shifts, clean-ups and plantings (after `sites`)"),
         ("announcements", announcements, "public debates and inspections the municipalities announce on their sites"),
     ):
         commands.add_parser(name, help=about).set_defaults(run=run)
+    quick = commands.add_parser("actions", help="actions to join: blood drives, volunteer shifts, clean-ups and plantings (after `sites`)")
+    quick.add_argument("--quick", action="store_true", help="only the institutes' pages and the volunteer service; the municipalities' rows stay")
+    quick.set_defaults(run=actions)
     build = commands.add_parser("site", help="build the site from data/ (fails on a page that loads from elsewhere)")
     build.add_argument("--out", default="_site")
     build.set_defaults(run=site)
