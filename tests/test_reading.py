@@ -66,15 +66,6 @@ def test_a_title_says_when_the_debate_was_held():
         assert not announcements.held(title), title
 
 
-def test_a_new_copy_of_the_list_says_what_it_changed():
-    row = lambda code, name, domain: {"municipality_code": code, "name": name, "domain": domain}
-    old = [row("1", "Ада", "ada.org.rs"), row("2", "Ариље", ""), row("3", "Бор", "bor.rs"), row("4", "Стара", "s.rs")]
-    new = [row("1", "Ада", "ada.org.rs"), row("2", "Ариље", "arilje.org.rs"), row("3", "Бор", ""), row("5", "Нова", "n.rs")]
-    assert sites.changes(old, new) == ["Ариље: no address -> arilje.org.rs", "Бор: bor.rs -> no address",
-                                       "Нова: added, n.rs", "Стара: left out"]
-    assert sites.table('municipality_code,name,domain,note\n1,Ада,ada.org.rs,"a, b"\n')[0]["note"] == "a, b"
-
-
 def test_an_announcement_keeps_when_it_is_on_and_not_its_text():
     a = announcements.entry("Јавни позив за јавну расправу", "https://a.rs/1", "2026-11-01T08:00:00", "wordpress posts",
                             "<p>Примедбе на мејл господина Петра Петровића, p@a.rs, до 15.11.2026. године.</p>")

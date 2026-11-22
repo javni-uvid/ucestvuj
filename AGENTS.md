@@ -15,8 +15,9 @@ people. The rules of work and the principles are here; each part's decisions are
   the maintainer's request); a domain and the family's link to it are the maintainer's decisions.
 - **The tests are `uv run pytest -q`**; the **test** workflow runs them on every pull request and on `main`,
   and **security** checks the workflows, the packages and the code. On Windows set `PYTHONUTF8=1`.
-- **The list of the municipalities' sites is izborna-analiza's** (`data/municipal_sites.csv` is a copy, brought by
-  `ucestvuj list` and the **list** workflow): an address found or corrected is written there, never here.
+- **The list of the municipalities' sites is the family's** (22 Nov 2026, the maintainer's decision): kept in
+  javni-uvid/osnova, read here from the copy, `osnova/data/municipalities.csv`. An address found or corrected
+  is written there, never here.
 - **The design rules and the code's rules are the family's** (21 Nov 2026, the maintainer's decision): the
   rules javni-uvid/zailiprotiv keeps, as javni-uvid/izborna-analiza took them, adapted here. A change to a page
   is checked against "Design rules" in `docs/decisions/site.md` (the phone first: 320 and 390 px, both

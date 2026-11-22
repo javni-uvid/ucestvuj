@@ -51,20 +51,12 @@ def consultations(_args) -> None:
           f'{sum(t["local"] for t in topics)} of municipalities')
 
 
-def sites_list(_args) -> None:
-    from ucestvuj import sites as source
-    changed = source.bring(DATA / "municipal_sites.csv")
-    for line in changed:
-        print("list:", line)
-    print(f"list: {len(changed)} changed")
-
-
 def sites(_args) -> None:
     from ucestvuj import sites as source
-    seen = source.survey(DATA / "municipal_sites.csv")
+    seen = source.survey(source.LIST)
     save(DATA / "sites.json", seen)
     up = [s for s in seen if s["answers"]]
-    note("sites", {"list": "javni-uvid/izborna-analiza data/municipal_sites.csv", "sites": len(seen), "answer": len(up)})
+    note("sites", {"list": "javni-uvid/osnova shared/data/municipalities.csv", "sites": len(seen), "answer": len(up)})
     print(f"sites: {len(up)} of {len(seen)} answer")
 
 
@@ -120,7 +112,6 @@ def main() -> int:
     for name, run, about in (
         ("opendata", opendata, "the bodies, the municipalities and local government's tasks, from data.gov.rs"),
         ("consultations", consultations, "every topic on eKonsultacije"),
-        ("list", sites_list, "the municipalities' sites: izborna-analiza's list, copied (says what changed)"),
         ("sites", sites, "what each municipality's own site is and links to"),
         ("laws", laws, "the text of the laws the guides rest on, from the Official Gazette's register"),
         ("announcements", announcements, "public debates and inspections the municipalities announce on their sites"),
