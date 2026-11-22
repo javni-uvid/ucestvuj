@@ -50,10 +50,11 @@ Not taken yet, to be weighed when the site gets its address: links without ".htm
 | security | on code or workflow changes, Mondays, by hand | actionlint, zizmor, pip-audit, CodeQL; reads only |
 | pages | on a push that changes the site or its data, every morning, by hand | build the site and publish it to GitHub Pages |
 | list | Tuesdays, by hand | the list of the municipalities' sites copied from `javni-uvid/izborna-analiza`; starts **pages** |
+| actions | daily (the quick reading; the whole one on Mondays), by hand | the actions to join read into `data/actions.json`; commits to `main` and starts **pages** |
 | osnova | daily, by hand | the organization's shared rules, look and tools copied into `osnova/` |
 
-The readings (`opendata`, `consultations`, `sites`, `announcements`, `actions`) are run by hand for now; no workflow asks a
-source. A run started with `GITHUB_TOKEN` can start another workflow (`gh workflow run`), which is how **list**
+The readings (`opendata`, `consultations`, `sites`, `announcements`) are run by hand for now; no workflow asks a
+source but **actions**. A run started with `GITHUB_TOKEN` can start another workflow (`gh workflow run`), which is how **list**
 starts **pages**: a push by a workflow's own token starts none.
 
 ## Tests

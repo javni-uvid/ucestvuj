@@ -313,6 +313,12 @@ the day, the hours and, for a position, the deadline. Never a contact.
 - **Environment actions: none on the page today.** No source found publishes a dated call to clean or to plant
   ahead of the day (the state's bodies publish news, the volunteer service's positions are event shifts). The
   kind is there, and the page says that there are few.
+- **Read by the **actions** workflow** (22 Nov 2026, the maintainer: "we can go with your recommendations"): every
+  day except Monday the quick reading, `ucestvuj actions --quick` (three requests: the institutes' pages and the
+  service's API; the municipalities' rows stay), on Mondays the whole reading. It commits to `main` when the
+  data changed and starts **pages**. A source that fails, or answers a page from which nothing could be read,
+  keeps its earlier rows that are still ahead (`actions.fetch`), so a page that changed its form is a gap that
+  closes by itself in a few days and not an empty site.
 - **Only what is ahead is kept** when read; the page lists what ends today or later, the nearest day first.
 - **Not read:** the Red Cross of Belgrade's list (the same lines as the Institute's, some differing), the plan
   of the Niš institute (a PDF a week), the Vojvodina volunteer centre's calendar (one past event), and Zavrni

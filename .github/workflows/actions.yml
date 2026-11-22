@@ -1,0 +1,61 @@
+# Reads the actions a person can join (data/actions.json): blood drives of the transfusion institutes, the volunteer
+# service of Novi Sad, and the municipalities' own posts. Every day except Monday the quick reading: three
+# requests (the institutes' pages and the service's API), and the municipalities' rows stay as they were; on
+# Mondays the whole reading, which searches the posts of 51 municipal sites. Blood drives are announced a week at
+# a time, so the quick reading is daily; the municipalities announce such actions rarely, so theirs is weekly.
+# It commits straight to main, as the data workflows do, and starts pages: a push by a workflow's own token
+# starts none. A source that fails keeps its earlier rows (docs/decisions/data.md, "The page of actions").
+name: actions
+
+on:
+  schedule:
+    - cron: "23 5 * * 0,2-6"
+    - cron: "23 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      whole:
+        description: "Read the municipalities' posts too (otherwise the quick reading)"
+        type: boolean
+        default: false
+
+permissions: {}
+
+concurrency:
+  group: actions
+  cancel-in-progress: false
+
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write  # commits data/actions.json and data/sources.json
+      actions: write   # starts pages
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Read
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SCHEDULE: ${{ github.event.schedule }}
+          WHOLE: ${{ inputs.whole }}
+        run: |
+          pip install -q uv==0.13.9 && uv sync --frozen
+          flag="--quick"
+          if [ "$SCHEDULE" = "23 5 * * 1" ] || [ "$WHOLE" = "true" ]; then flag=""; fi
+          # shellcheck disable=SC2086
+          uv run ucestvuj actions $flag
+          git add data/actions.json
+          if git diff --cached --quiet; then
+            echo "actions: nothing new"
+            exit 0
+          fi
+          uv run pytest -q
+          git add data/sources.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "The actions to join as read today"
+          git push -q
+          gh workflow run pages.yml

@@ -157,18 +157,27 @@ def of_municipality(site: dict) -> list[dict]:
     return list(best.values())
 
 
-def fetch(sites: list[dict], workers: int = 12) -> list[dict]:
-    """Every source read once. A source that does not answer is skipped, the others are kept."""
-    found = []
-    for read in (lambda: transfusion_vojvodina(web.get(ZTKV, timeout=40).decode("utf-8", "replace")),
-                 lambda: transfusion_serbia(web.get(ITKS, timeout=40).decode("utf-8", "replace")),
-                 lambda: volunteer_service(web.get_json(NVS, timeout=40))):
+def fetch(sites: list[dict], previous: list[dict] = (), municipalities: bool = True, workers: int = 12) -> list[dict]:
+    """The sources read once. `municipalities=False` reads only the three pages of the institutes and the
+    service (the quick reading: three requests); the municipalities' rows are then those of `previous`.
+    A source that does not answer, or answers a page from which nothing could be read, keeps its rows of
+    `previous` that are still ahead: a page that changed its form must not empty the site."""
+    found, read_ok = [], set()
+    for name, read in (("ztkv", lambda: transfusion_vojvodina(web.get(ZTKV, timeout=40).decode("utf-8", "replace"))),
+                       ("itks", lambda: transfusion_serbia(web.get(ITKS, timeout=40).decode("utf-8", "replace"))),
+                       ("nvs", lambda: volunteer_service(web.get_json(NVS, timeout=40)))):
         try:
-            found += read()
+            rows = read()
         except Exception:
-            pass
-    with ThreadPoolExecutor(workers) as pool:
-        found += [a for rows in pool.map(of_municipality, sites) for a in rows]
+            continue
+        if rows:
+            found += rows
+            read_ok.add(name)
+    if municipalities:
+        with ThreadPoolExecutor(workers) as pool:
+            found += [a for rows in pool.map(of_municipality, sites) for a in rows]
+        read_ok.add("municipality")
+    found += [a for a in previous if a["source"] not in read_ok]
     today = datetime.date.today().isoformat()
     found = [a for a in found if a["end"] >= today]  # what is over is not kept
     unique = {(a["source"], a["place"], a["start"], a["url"], a["title"]): a for a in found}

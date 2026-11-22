@@ -179,3 +179,25 @@ def test_a_volunteer_position_keeps_its_days_and_never_the_hosts_contact():
     assert (position["start"], position["deadline"], position["venue"], position["title"], position["time"]) == ("2026-11-29", "2026-11-27", "OC OPENS", "OBRT fest – razmena", "14:00–20:00")
     assert actions._hours("Догађај ће трајати од 11 до 16 часова. Уколико број волонтера") == "11:00–16:00" and actions._hours("jedna smena") == ""
     assert "0692019016" not in str(position) and "gmail" not in str(position)
+
+
+def test_a_source_that_fails_or_changed_its_form_keeps_its_earlier_rows(monkeypatch):
+    ahead = "2999-01-01"
+    earlier = [actions.action("blood", "ztkv", "Ruma", "t", "https://a.rs/1", ahead),
+               actions.action("blood", "itks", "Шабац", "t", "https://a.rs/2", ahead),
+               actions.action("blood", "itks", "Бор", "t", "https://a.rs/3", "2000-01-01"),  # over: not kept
+               actions.action("environment", "municipality", "Ада", "t", "https://a.rs/4", ahead)]
+    page = ('<a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=x%20%E2%80%94%20Vrbas'
+            f'&dates={ahead.replace("-", "")}T080000/{ahead.replace("-", "")}T110000&location=Vrbas%2C%20Bolnica">+</a>')
+
+    def get(url, **kw):
+        if "transfuzija" in url:
+            return page.encode()
+        raise OSError("no answer")  # the Institute of Serbia does not answer
+
+    monkeypatch.setattr(actions.web, "get", get)
+    monkeypatch.setattr(actions.web, "get_json", lambda *a, **k: [])  # the volunteer service answers nothing readable
+    quick = actions.fetch([], earlier, municipalities=False)
+    assert [(a["source"], a["place"]) for a in quick] == [("ztkv", "Vrbas"), ("itks", "Шабац"), ("municipality", "Ада")]
+    # the earlier row of a source that was read is replaced by what it says now, not kept beside it
+    assert "Ruma" not in str(quick)
