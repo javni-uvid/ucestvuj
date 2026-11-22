@@ -10,7 +10,10 @@ The sources, each read by its own page's form (docs/decisions/data.md, "Other wa
 - the volunteer service of Novi Sad: a post type of its own with the days, the place and the deadline as fields;
   the host's phone and e-mail, which the same posts carry, are not read;
 - the municipalities' own posts (the sites whose posts can be searched): a call to give blood, a clean-up, a
-  planting or a volunteer action, kept only when its text names a day from the post's own on.
+  planting or a volunteer action, kept only when its text names a day from the post's own on;
+- the feeds of organizers and news sites listed in data/action_feeds.csv: the same rule for an entry, and the row
+  says it is the organizer's news;
+- the actions readers reported, checked and kept in data/actions_manual.json: the row says it is a reader's report.
 
 Each action keeps the kind, who announces it, the place, the title as written, the address of the announcement
 and the days; never a person's contact."""
@@ -19,6 +22,7 @@ import datetime
 import html
 import re
 import urllib.parse
+import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 
 from ucestvuj import announcements, web, when
@@ -35,7 +39,7 @@ ORGANIZERS = {"ztkv": "Завод за трансфузију крви Војв�
 
 def action(kind: str, source: str, place: str, title: str, url: str, start: str, end: str = "", **more) -> dict:
     return {"kind": kind, "source": source, "organizer": ORGANIZERS.get(source, ""), "place": place, "title": title,
-            "url": url, "start": start, "end": end or start, "time": "", "venue": "", "deadline": "", "code": "", **more}
+            "url": url, "start": start, "end": end or start, "time": "", "venue": "", "deadline": "", "code": "", "how": "", **more}
 
 
 def _text(fragment: str) -> str:
@@ -127,6 +131,61 @@ ASKED = {"blood": ("давање крви", "davanje krvi", "давалаца к
          "volunteer": ("волонтерска акција", "волонтери", "volonterska akcija")}
 
 
+def ahead(title: str, text: str, published: str) -> tuple[str, str] | None:
+    """The start and the end of the nearest thing a post's text names from the post's own day on, or nothing."""
+    items = [i for i in when.read(f"{title}. {text}", published) if i["from"] or i["to"]]
+    days = [d for i in items for d in (i["from"], when.until(i)) if d and d >= published]
+    if not days:
+        return None
+    item = next(i for i in items if min(days) in (i["from"], when.until(i)))
+    return item["from"] or item["to"], when.until(item)
+
+
+def kind_of(title: str) -> str:
+    """What a title calls to, when it calls to something that isn't over: blood, environment or volunteer."""
+    low = latin(title).lower()
+    if not CALL.search(low) or announcements.held(title):
+        return ""
+    return next((k for k, cue in CUES.items() if cue.search(low)), "")
+
+
+def of_feed(feed: dict) -> list[dict]:
+    """The entries of an organizer's feed that call to join something and name a day ahead."""
+    try:
+        root = ET.fromstring(web.get(feed["url"], timeout=40))
+    except Exception:
+        return []
+    found = []
+    for entry in root.iter():
+        if entry.tag.rsplit("}", 1)[-1] not in ("item", "entry"):
+            continue
+        parts = {child.tag.rsplit("}", 1)[-1]: child for child in entry}
+        link = parts.get("link")
+        url = ((link.text or link.get("href") or "") if link is not None else "").strip()
+        title = announcements.clean(parts["title"].text if "title" in parts else "")
+        published = announcements.day(next((parts[k].text or "" for k in ("pubDate", "published", "updated", "date") if k in parts), ""))
+        kind = kind_of(title)
+        if not (kind and url.startswith("http") and published):
+            continue
+        text = announcements.clean(" ".join(parts[k].text or "" for k in ("encoded", "content", "description", "summary") if k in parts))
+        days = ahead(title, text, published)
+        if days:
+            found.append(action(kind, "feed", feed.get("place", ""), title, url, days[0], days[1],
+                                organizer=feed["organizer"], how="news", published=published))
+    return found
+
+
+def reported(rows: list[dict]) -> list[dict]:
+    """The actions readers reported and a person checked, from data/actions_manual.json. A row without a kind, an
+    organizer, a title, an address or a day is not taken."""
+    found = []
+    for r in rows:
+        if r.get("kind") in KINDS and r.get("organizer") and r.get("title") and str(r.get("url", "")).startswith("http") and r.get("start"):
+            found.append(action(r["kind"], "report", r.get("place", ""), r["title"], r["url"], r["start"], r.get("end", ""),
+                                organizer=r["organizer"], how="report", venue=r.get("venue", ""), time=r.get("time", "")))
+    return found
+
+
 def of_municipality(site: dict) -> list[dict]:
     """A municipality's posts that call to give blood, to clean, to plant or to volunteer, with the days the post's
     text names from its own day on. A post whose title says it is over, or whose text names no day ahead, is not
@@ -146,18 +205,15 @@ def of_municipality(site: dict) -> list[dict]:
                 low = latin(title).lower()
                 if not CUES[kind].search(low) or not CALL.search(low) or announcements.held(title):
                     continue
-                items = [i for i in when.read(f"{title}. {announcements.clean(p['content']['rendered'])}", p["date"][:10]) if i["from"] or i["to"]]
-                ahead = [d for i in items for d in (i["from"], when.until(i)) if d and d >= p["date"][:10]]
-                if not ahead:
-                    continue
-                first = min(ahead)
-                item = next(i for i in items if first in (i["from"], when.until(i)))
-                best[p["link"]] = action(kind, "municipality", site["name"], title, p["link"], item["from"] or item["to"], when.until(item),
-                                         organizer=site["name"], code=site["code"], published=p["date"][:10])
+                days = ahead(title, announcements.clean(p["content"]["rendered"]), p["date"][:10])
+                if days:
+                    best[p["link"]] = action(kind, "municipality", site["name"], title, p["link"], days[0], days[1],
+                                             organizer=site["name"], code=site["code"], published=p["date"][:10])
     return list(best.values())
 
 
-def fetch(sites: list[dict], previous: list[dict] = (), municipalities: bool = True, workers: int = 12) -> list[dict]:
+def fetch(sites: list[dict], previous: list[dict] = (), municipalities: bool = True, feeds: list[dict] = (),
+          manual: list[dict] = (), workers: int = 12) -> list[dict]:
     """The sources read once. `municipalities=False` reads only the three pages of the institutes and the
     service (the quick reading: three requests); the municipalities' rows are then those of `previous`.
     A source that does not answer, or answers a page from which nothing could be read, keeps its rows of
@@ -177,6 +233,10 @@ def fetch(sites: list[dict], previous: list[dict] = (), municipalities: bool = T
         with ThreadPoolExecutor(workers) as pool:
             found += [a for rows in pool.map(of_municipality, sites) for a in rows]
         read_ok.add("municipality")
+    for feed in feeds:  # a feed that gives nothing today gives nothing: its entries are the latest ten
+        found += of_feed(feed)
+    found += reported(manual)
+    read_ok |= {"feed", "report"}
     found += [a for a in previous if a["source"] not in read_ok]
     today = datetime.date.today().isoformat()
     found = [a for a in found if a["end"] >= today]  # what is over is not kept

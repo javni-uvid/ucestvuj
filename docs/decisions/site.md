@@ -119,6 +119,9 @@ the environment, giving blood, positive initiatives there".
 - **The order is the nearest day first;** what is over is not listed. The page says that not every action is open
   to everyone (a firm's or an institution's own employees), and that there are few for the environment, since
   organizers rarely announce them ahead.
+- **A reader can report an action:** under the list, a link to a form (`akcija.yml`) with a link to the organizer's
+  announcement; it is checked and added with its source said, as a reader's report (`docs/decisions/data.md`).
+  A row from a feed says "вести на њиховом сајту"; one without a place says that the place is in the announcement.
 - **Who may be a source** and what is read are in `docs/decisions/data.md` ("The page of actions, and the rule for
   its sources").
 

@@ -46,7 +46,7 @@ always as a PDF on its own site; there is no central, machine-readable collectio
 | Each municipality's own site and gazette | The statute itself | Not read |
 | data.gov.rs, "decisions in the public interest" (about 25 cities, mostly one upload in May 2022) | Lists of local decisions | Seen in the survey of 20 Nov; stale |
 
-What the statute is read for is a small, fixed set of fields per mechanism (a number of signatures, who calls,
+**Decided 22 Nov 2026: a model reads the statute and a person checks it.** What the statute is read for is a small, fixed set of fields per mechanism (a number of signatures, who calls,
 a deadline, the article), so a municipality is a row, not a text. A start with the 20 municipalities already
 read elsewhere, or with the largest cities, shows whether the fields hold before all are read.
 
@@ -75,7 +75,7 @@ the body and the office and not the name: the columns with names are dropped whe
 Handbooks of organizations (Građanske inicijative, SKGO, the students' handbook on assemblies), news, and
 Javni uvid's own earlier survey: they help find a rule and never supply one.
 
-## A proposed first step
+## A proposed first step (decided 22 Nov 2026: this order)
 
 The request for information of public importance: one law, the same for the whole country, no statute needed,
 and the catalogue gives the address of every body. One guide and one letter-writer, then the citizens'
@@ -291,18 +291,30 @@ we say it is the source".
   association, a group of citizens), news and a social network, as long as the row says that this is the source
   and links it. The organizer or the reporter is named on every row ("Извор: …"). Nothing from a source of this
   kind is a rule, a number or a deadline of the law, and no person's contact is carried (principle 4).
-- **Not built, and why:** a social network's pages are not read by a program (they ask for a login, and their
-  terms forbid it), so for now what is read is what a site publishes in the open. A news site is read when it
-  has a feed worth reading; none has been added.
+- **How news and social networks come in** (22 Nov 2026, the maintainer: "feeds, reports"): a social network's
+  pages are not read by a program (they ask for a login, and their terms forbid it). Instead **feeds**: the
+  organizers' and news sites' own feeds are listed in `data/action_feeds.csv` (an organizer, the feed, a place
+  where it has one) and an entry is kept by the rule for a municipality's post (a title that calls, not over, and
+  a text that names a day ahead); the row says "вести на њиховом сајту". And **readers' reports**: a link on the
+  page opens a form (`.github/ISSUE_TEMPLATE/akcija.yml`: a link to the organizer's announcement, who organizes,
+  the kind, the place, the day, and no personal data); a person checks the announcement and adds the action to
+  `data/actions_manual.json`; the row says "пријава читаоца, проверена" and the organizer is the source. The
+  first seven feeds are those of Zasadi drvo, the Mountaineering Association, Mladi istraživači Srbije (two),
+  the Vojvodina volunteer centre, Srbijašume and Vojvodinašume.
 - **"Positive" is the maintainer's word,** for an action that does good to the place or to the people in it. The
   rule applied is the same for every organizer (principle 1): the organizer itself publishes the action, in a
   list of events or positions or in a post that names a day, open to anyone. What is open to anyone and what is
   closed (a drive for a firm's employees) is said when the organizer says it: the Institute for Blood Transfusion
   of Serbia marks such lines, and they are left out; where a source doesn't say, the page tells the reader to ask
   the organizer.
-- **Open question (the maintainer's):** whether a call that is political is left out by its content, which is a
-  judgement (principle 3), or only by the rule above. The one such source found, the drive of Zavrni rukave to
-  remove political graffiti after the election, has no reader yet and is not on the page.
+- **The political question** (decided below as A): whether a call that is political is left out by its content,
+  which is a judgement (principle 3), or only by the rule above. The one such source found, the drive of Zavrni
+  rukave to remove political graffiti after the election, has no reader yet and is not on the page.
+
+- **Decided on 22 Nov 2026:** A. The political question above: every organizer that publishes actions open to
+  anyone is taken by the same rule, and the call's aim is not judged; it is a rule that doesn't look at whom it
+  favours (principle 1) and the page names the organizer on every row. Zavrni rukave is then only waiting for a
+  reader of its page (a day without a year; a weekday beside it settles the year).
 
 ### What is read into `data/actions.json` (`ucestvuj actions`, by hand for now)
 

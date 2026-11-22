@@ -41,6 +41,10 @@ uv run pytest -q              # no test asks a source
 
 The readings are run by hand for now; only **actions** asks a source by itself.
 
+**An action the page of actions lacks** is reported by a form (`.github/ISSUE_TEMPLATE/akcija.yml`, linked from the
+page); an organizer's or a news site's feed is added to `data/action_feeds.csv`; a checked report goes into
+`data/actions_manual.json`.
+
 **A municipality's site that is missing or wrong** is reported to
 [izborna-analiza](https://github.com/javni-uvid/izborna-analiza/issues): the list is one for both projects, and
 a correction there reaches this site with the next copy.
