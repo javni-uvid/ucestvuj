@@ -160,3 +160,16 @@ def test_the_guide_quotes_the_law_word_for_word_and_the_letter_has_the_same_blan
     # the Commissioner's address on the page is the catalogue's
     catalogue = (site.DATA / "bodies.csv").read_text(encoding="utf-8")
     assert all(part in catalogue for part in guide.COMMISSIONER_IN_CATALOGUE)
+
+
+def test_the_guide_to_the_initiative_quotes_the_law_and_says_the_statutes_are_not_read(tmp_path):
+    import json
+    law = json.loads((site.DATA / "laws.json").read_text(encoding="utf-8"))["local"]
+    out = tmp_path / "s"
+    site.build(out, datetime.date(2026, 11, 22))
+    page = html.unescape((out / "cir" / "inicijativa.html").read_text(encoding="utf-8"))
+    article = next(a for a in law["articles"] if a["number"] == "69")
+    assert all(p in page for p in article["paragraphs"])  # the whole of article 69, word for word
+    assert "Статуте општина још не читамо" in page
+    assert "inicijativa.html" in (out / "cir" / "vodici.html").read_text(encoding="utf-8")
+    assert (out / "inicijativa.html").exists() and (out / "vodici.html").exists()

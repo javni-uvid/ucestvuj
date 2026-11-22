@@ -139,7 +139,7 @@ def frame(path: str, script: str, title: str, description: str, main: str, read:
   <nav aria-label="Сајт">
     <a href="{home}index.html">Расправе</a>
     <a href="{home}akcije.html">Акције</a>
-    <a href="{home}zahtev.html">Водич</a>
+    <a href="{home}vodici.html">Водичи</a>
     <a href="{home}opstine.html">Општине</a>
     <a href="{home}drzava.html">Држава</a>
     <a href="{home}o-projektu.html">О пројекту</a>
@@ -428,7 +428,7 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 </ul>
 <h2>Шта још није овде</h2>
 <ul>
-<li>Водичи кроз остале начине да се учествује (грађанска иницијатива, збор грађана, јавна расправа): први је <a href="{{home}}zahtev.html">захтев за информације од јавног значаја</a>, сваки корак са чланом закона на коме почива. Остали чекају статуте општина.</li>
+<li>Водичи кроз остале начине да се учествује (грађанска иницијатива, збор грађана, јавна расправа): <a href="{{home}}vodici.html">два су написана</a> (захтев за информације од јавног значаја; грађанска иницијатива и збор грађана), сваки корак са чланом закона на коме почива. Јавна расправа чека статуте општина.</li>
 <li>Општине чије објаве још не умемо да прочитамо, и место расправе: објава га наводи у тексту, а ми из њега читамо само када је шта.</li>
 <li>Јавни увиди у планове које објављују министарство, покрајина и заводи за урбанизам, и процене утицаја на животну средину.</li>
 </ul>
@@ -436,6 +436,8 @@ def build(out: Path, today: datetime.date | None = None) -> list[str]:
 """)
 
     pages["zahtev.html"] = guide.page(data["laws"]["access"], data["laws"]["procedure"])
+    pages["inicijativa.html"] = guide.initiative_page(data["laws"]["local"])
+    pages["vodici.html"] = guide.index_page()
 
     if out.exists():
         shutil.rmtree(out)

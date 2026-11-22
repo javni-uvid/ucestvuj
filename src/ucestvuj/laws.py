@@ -21,12 +21,14 @@ PAGE = "https://pravno-informacioni-sistem.rs/reg/viewAct/"
 LAWS = {
     "access": {"guid": "0b7f7931-f230-45cf-b550-a1495539249d"},  # Law on Free Access to Information of Public Importance
     "procedure": {"guid": "3544aef0-85fd-4733-8214-e8bb95edf4af"},  # Law on General Administrative Procedure
+    "local": {"guid": "2e5d965c-289e-4c70-af35-79af41aaf916"},  # Law on Local Self-Government
 }
 
 # "Члан 12." and, for an article added later, "Члан 28а" (no full stop)
 _ARTICLE = re.compile(r"\n[ \t]*Члан[ \t]+(\d+[а-џ]?)\.?[ \t]*\n")
 _END = re.compile(r"\n[ \t]*ОДРЕДБЕ КОЈЕ НИСУ УНЕТЕ")
-_NOTE = re.compile(r"^\*+\s*Службени гласник[^\n]*$", re.M)
+# the register ends an amended article with a note; some break after "број" and put the number on the next line
+_NOTE = re.compile(r"^\*+\s*Службени гласник[^\n(]*(?:\n?\([^)]*\))?[^\n]*(?:\n\d[^\n]{0,60})?$", re.M)
 
 
 def plain(page: str) -> str:
@@ -34,13 +36,15 @@ def plain(page: str) -> str:
     page = re.sub(r"(?is)<(script|style).*?</\1>", "", page)
     page = re.sub(r"(?i)<br\s*/?>|</p>|</div>|</tr>", "\n", page)
     text = html.unescape(re.sub(r"<[^>]+>", "", page)).replace("\xa0", " ").replace("\r", "")
-    return re.sub(r"[ \t]+", " ", text)
+    return re.sub(r" ?\n ?", "\n", re.sub(r"[ \t]+", " ", text))  # no space at the edge of a line
 
 
 def _is_heading(paragraph: str) -> bool:
     """A line between two articles that names the next one or the part it opens: not a sentence (no full stop,
     semicolon or colon at its end), or a part's number and name ("II ИСКЉУЧЕЊЕ И ОГРАНИЧЕЊЕ ...")."""
-    return bool(re.match(r"[IVX]+ [А-ЯЂЈЉЊЋЏ ,-]{6,}$", paragraph)) or not paragraph.endswith((".", ";", ":", ",", "”", '"'))
+    if "Службени гласник" in paragraph:  # the title block's gazette line
+        return False
+    return bool(re.match(r"[IVX]+\.? [А-ЯЂЈЉЊЋЏ ,-]{6,}$", paragraph)) or not paragraph.endswith((".", ";", ":", ",", "”", '"'))
 
 
 def articles(text: str) -> list[dict]:
@@ -57,7 +61,7 @@ def articles(text: str) -> list[dict]:
     heading = " · ".join(h for h in opening if h)
     for i in range(1, len(parts), 2):
         body = parts[i + 1]
-        notes = [n.lstrip("* ").strip() for n in _NOTE.findall(body)]
+        notes = [re.sub(r"\s+", " ", n.lstrip("* ")).strip() for n in _NOTE.findall(body)]
         body = _NOTE.sub("", body)
         paragraphs = [re.sub(r"\s+", " ", p).strip() for p in re.split(r"\n\s*\n", body)]
         paragraphs = [p for p in paragraphs if p]
@@ -78,7 +82,7 @@ def fetch(key: str) -> dict:
     text = plain(page)
     head = text[:text.find("Члан")]
     title = re.search(r"ЗАКОН\s+([^\n]+)\n", head)
-    gazette = re.search(r"[“\"]Службени гласник РС[”\"],.*?(?:\n\s*\n|$)", head, re.S)
+    gazette = re.search(r"[“„\"]Службени гласник РС[”“\"],.*?(?:\n\s*\n|$)", head, re.S)
     return {
         "title": ("Закон " + title.group(1).strip()) if title else "",
         "gazette": re.sub(r"\s+", " ", gazette.group(0)).strip() if gazette else "",

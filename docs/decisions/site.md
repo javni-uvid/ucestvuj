@@ -195,3 +195,21 @@ Information of Public Importance as the register prints it, `docs/decisions/data
   and the provincial and local organs, the municipal administrations and assemblies) would fit. The decision of
   how is the maintainer's. Also not done: a print or PDF form; the page seen on a phone in a real browser (the
   headless browser would not start on 22 Nov; the letters' logic was run in Node with a stand-in document).
+
+## The guide to the citizens' initiative and assembly (22 Nov 2026)
+
+`inicijativa.html`, with an index of the guides (`vodici.html`, "Водичи" in the bar). It rests on the Law on Local
+Self-Government alone (articles 67 to 71: the forms of direct participation, the initiative with its 60 days and its
+signatures, the citizens' assembly, the referendum on a citizens' proposal, the complaint about an organ's work), the
+same way as the first guide: our words marked, the law's word for word, the version and the register's link.
+
+- **What the statute decides is said to be the statute's, and no statute is read yet.** The page says so at the top
+  and sends the reader to the municipalities' page for the municipality's site. The law leaves to the statute the
+  area an assembly is convened for, who convenes it and how it works (art. 69), and the rest of the referendum's
+  procedure (art. 70); how signatures are collected is for "the regulations on the citizens' initiative", which
+  are not read either.
+- **Why this order:** the statutes are the hard layer (a PDF in each municipality's gazette; no collection). The
+  guide gives what the law gives all the municipalities, the same for each (principle 1), and the statutes
+  are read when a guide needs a number from them: a model reads, a person checks (22 Nov 2026), starting with
+  municipalities lexifina has, which are mostly Belgrade's own (the fields have to hold before all are read).
+- **No letter-writer here:** the law gives no form for a proposal, and a statute may.

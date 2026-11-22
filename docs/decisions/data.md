@@ -54,8 +54,12 @@ answering, the reading fails and the last text stays (`data/laws.json`).
   13 and 48 are deleted in the register.
   The Law on General Administrative Procedure (18/2016, 95/2018, 2/2023; the version in force from 13 Jan 2023),
   217 articles, is read the same way, because the complaint rests on it: all 217 are the same as lexifina's but one
-  (art. 178, where the register keeps the note "(3) Престао је да важи" that lexifina leaves out). lexifina is therefore a means to check, as principle 2 says, and not a source.
-- **Also found:** the articles 28а and 28б exist (added by 105/2021) and are written without a full stop.
+  (art. 178, where the register keeps the note "(3) Престао је да важи" that lexifina leaves out). The Law on Local Self-Government (129/2007 and later; in force from 26 Nov 2021),
+  111 articles, all the same as lexifina's, is read for the guide to the initiative and the assembly. lexifina is
+  therefore a means to check, as principle 2 says, and not a source.
+- **Also found:** the articles 28а and 28б exist (added by 105/2021) and are written without a full stop; the
+  register's amendment notes sometimes break over lines or hold a parenthesis ("(види Аутентично тумачење)"), and
+  the Law on Local Self-Government's title block quotes „…“, not “…”: the reader handles these (`laws.py`).
 
 ## A municipality's statute
 
