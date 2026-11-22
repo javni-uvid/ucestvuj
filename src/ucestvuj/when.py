@@ -48,6 +48,10 @@ CUES = (
 )
 # A body named after what it runs is not that thing: "јавна седница Комисије за јавни увид" is a session.
 _BODY = re.compile(r"komisij\w+\s+za\s+(?:\w+\s+)?javn\w+\s+(?:uvid|rasprav)\w*")
+# Just before a day that is not the announcement's own: the day a newspaper printed the notice ("оглас, Вечерње
+# новости од 06.08.2024."), or a day that the announcement says was changed ("уместо како је раније било објављено
+# у среду 15. априла"). Read in Latin, lower case, in the last words before the day.
+_NOT_OURS = re.compile(r"novosti|ve[cč]ernj|dnevn\w+\s+list|umesto|ranije|prethodno\s+(?:bilo\s+)?objavljen")
 _NEAR = 12    # how far a day without a year may stand from the dated day that ends its range
 _BEFORE = 260  # how far back the words that name a day are looked for
 AHEAD = 400    # a day further than this after the announcement is not this announcement's
@@ -105,6 +109,9 @@ def read(text: str, published: str) -> list[dict]:
     while i < len(days):
         start, end, day = days[i]
         before = text[max(cut, start - _BEFORE):start]
+        if _NOT_OURS.search(before[-70:]):
+            i, cut = i + 1, end
+            continue
         item = {"what": _what(before), "from": "", "to": "", "days": 0, "hour": ""}
         if i + 1 < len(days) and _TO.match(text[end:days[i + 1][0]]):
             start2, end2, day2 = days[i + 1]
